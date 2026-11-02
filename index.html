@@ -25,12 +25,12 @@
                     },
                     colors: {
                         vault: {
-                            50: '#fdf2f8',  // Soft pink bg
+                            50: '#fdf2f8',  
                             100: '#fce7f3',
-                            200: '#fbcfe8', // Dusty pink
+                            200: '#fbcfe8', 
                             300: '#f9a8d4',
                             400: '#f472b6',
-                            500: '#ec4899', // Primary Pink
+                            500: '#ec4899', 
                             600: '#db2777',
                             700: '#be185d',
                             800: '#9d174d',
@@ -75,12 +75,12 @@
 </head>
 <body class="text-gray-800 font-sans antialiased overflow-hidden">
 
-    <!-- CUSTOM BACKGROUND IMAGE WITH BLUR OVERLAY -->
-    <!-- Memastikan foto menutupi layar tanpa terhalang elemen solid -->
-    <div class="fixed inset-0 z-[-2] pointer-events-none" style="background-image: url('https://drive.google.com/uc?export=view&id=1azK9RNOAVTKRJxlFdbpEanWmfyBv7-pL'); background-size: cover; background-position: center; background-attachment: fixed;"></div>
+    <!-- CUSTOM BACKGROUND IMAGE DENGAN BYPASS GOOGLE DRIVE -->
+    <div class="fixed inset-0 z-[-2] w-full h-full pointer-events-none" style="background-image: url('https://drive.google.com/uc?export=view&id=1azK9RNOAVTKRJxlFdbpEanWmfyBv7-pL'); background-size: cover; background-position: center; background-attachment: fixed;"></div>
     
-    <!-- Efek Blur/Kaca Embun yang lebih elegan -->
-    <div class="fixed inset-0 z-[-1] bg-white/30 backdrop-blur-[15px] pointer-events-none"></div>
+    <!-- Efek Blur/Kaca Embun Premium (Gradien Biru-Ungu-Pink Penuh Layar) -->
+    <div class="fixed inset-0 z-[-1] w-full h-full bg-gradient-to-br from-blue-500/20 via-purple-400/20 to-pink-500/30 backdrop-blur-[15px] pointer-events-none"></div>
+
 
     <!-- Toast Notification -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-[90%] md:max-w-sm px-4 md:px-0"></div>
@@ -309,7 +309,7 @@
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // Konfigurasi Firebase dari akun Anda
+        // Konfigurasi Firebase Milik Anda
         const firebaseConfig = {
             apiKey: "AIzaSyCBPtcWIM1s_Vf-4OGCt-LTYeSiosNVRhs",
             authDomain: "data-pribadi-1b175.firebaseapp.com",
@@ -540,7 +540,7 @@
             const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'documents'), orderBy('createdAt', 'desc'));
             unsubscribeDocs = onSnapshot(q, (snapshot) => {
                 allDocuments = [];
-                snapshot.forEach(doc => allFolders.push(allDocuments.push({ id: doc.id, ...doc.data() })));
+                snapshot.forEach(doc => allDocuments.push({ id: doc.id, ...doc.data() }));
                 navigate(currentView, currentView === 'folder' ? document.querySelector('.nav-item.bg-white\\/80')?.dataset.view.replace('folder-','') : null);
             });
         }
