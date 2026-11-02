@@ -1,0 +1,329 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Documents - Digital Vault</title>
+    
+    <!-- Google Fonts: Poppins & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        vault: {
+                            50: '#fdf2f8',  // Soft pink bg
+                            100: '#fce7f3',
+                            200: '#fbcfe8', // Dusty pink
+                            300: '#f9a8d4',
+                            400: '#f472b6',
+                            500: '#ec4899', // Primary Pink
+                            600: '#db2777',
+                            700: '#be185d',
+                            800: '#9d174d',
+                            900: '#831843',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar & Animations */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f9a8d4; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-vault-50 text-gray-800 font-sans antialiased overflow-hidden">
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- ================= AUTHENTICATION VIEW ================= -->
+    <div id="auth-view" class="h-screen w-full flex items-center justify-center bg-gradient-to-br from-vault-50 to-vault-200 p-4">
+        <div class="glass-panel p-8 rounded-3xl shadow-xl w-full max-w-md text-center transform transition-all">
+            <div class="mb-8">
+                <div class="w-16 h-16 bg-vault-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fa-solid fa-shield-halved text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-display font-bold text-gray-900">My Documents</h1>
+                <p class="text-sm text-gray-500 mt-2">Digital Document Vault</p>
+            </div>
+
+            <!-- Login Tabs -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button onclick="switchAuthTab('user')" id="tab-user" class="flex-1 py-2 font-medium text-vault-600 border-b-2 border-vault-500">User Login</button>
+                <button onclick="switchAuthTab('admin')" id="tab-admin" class="flex-1 py-2 font-medium text-gray-400 border-b-2 border-transparent hover:text-gray-600">Admin Login</button>
+            </div>
+
+            <!-- User Login (Google) -->
+            <div id="user-login-form" class="space-y-4">
+                <p class="text-sm text-gray-600 mb-4">Masuk dengan aman menggunakan akun Google Anda.</p>
+                <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-xl py-3 px-4 text-gray-700 font-medium hover:bg-gray-50 transition shadow-sm">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                    Continue with Google
+                </button>
+            </div>
+
+            <!-- Admin Login (Email/Pass) -->
+            <div id="admin-login-form" class="hidden space-y-4 text-left">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
+                    <input type="email" id="admin-email" class="w-full rounded-xl border-gray-300 border p-3 focus:ring-2 focus:ring-vault-500 focus:border-vault-500 outline-none transition" placeholder="admin@domain.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="admin-password" class="w-full rounded-xl border-gray-300 border p-3 focus:ring-2 focus:ring-vault-500 focus:border-vault-500 outline-none transition" placeholder="••••••••">
+                </div>
+                <button id="btn-admin-login" class="w-full bg-gray-900 text-white rounded-xl py-3 font-medium hover:bg-gray-800 transition shadow-md">
+                    Login as Admin
+                </button>
+            </div>
+            
+            <div id="auth-loading" class="hidden mt-4 text-vault-500">
+                <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MAIN APP VIEW ================= -->
+    <div id="app-view" class="hidden h-screen w-full flex bg-vault-50">
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="bg-white w-64 h-full shadow-xl flex flex-col transition-transform transform -translate-x-full md:translate-x-0 fixed md:relative z-30 border-r border-gray-100">
+            <div class="p-6 flex items-center gap-3 border-b border-gray-50">
+                <div class="w-10 h-10 bg-vault-100 text-vault-600 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-display font-bold text-lg leading-tight text-gray-900">My Docs</h2>
+                    <p class="text-xs text-gray-400">Digital Vault</p>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto hide-scroll py-4 px-3 space-y-1" id="nav-menu">
+                <!-- Navigation inserted via JS -->
+            </div>
+
+            <div class="p-4 border-t border-gray-100">
+                <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-2 text-red-500 hover:bg-red-50 rounded-xl transition font-medium">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+            
+            <!-- Top Header -->
+            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 md:px-8 z-10 sticky top-0">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="md:hidden text-gray-600 hover:text-vault-600 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <h2 id="header-title" class="font-display font-semibold text-xl text-gray-800">Dashboard</h2>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="relative hidden md:block">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="global-search" placeholder="Cari dokumen..." class="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-vault-300 w-64 transition-all">
+                    </div>
+                    
+                    <button class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 hover:text-vault-600 transition relative">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+
+                    <div class="flex items-center gap-3 border-l border-gray-200 pl-4 cursor-pointer" onclick="navigate('profile')">
+                        <div class="text-right hidden sm:block">
+                            <p id="user-name-display" class="text-sm font-semibold text-gray-800">User Name</p>
+                            <p id="user-role-display" class="text-xs text-gray-500">Premium Member</p>
+                        </div>
+                        <img id="user-avatar-display" src="https://placehold.co/100x100/ec4899/ffffff?text=U" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-vault-100 shadow-sm">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content View -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-gradient-to-b from-transparent to-vault-50/50" id="main-content">
+                <!-- Dynamic Content Loaded Here -->
+            </div>
+            
+            <!-- Floating Action Button (Upload) -->
+            <button id="fab-upload" onclick="openUploadModal()" class="fixed bottom-8 right-8 w-14 h-14 bg-vault-500 text-white rounded-full shadow-lg shadow-vault-300 flex items-center justify-center text-2xl hover:bg-vault-600 hover:scale-105 transition transform z-10">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </main>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+    
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden fade-in">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 class="font-display font-semibold text-lg text-gray-800">Upload Dokumen Baru</h3>
+                <button onclick="closeUploadModal()" class="text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-1 hide-scroll">
+                <form id="upload-form" class="space-y-5">
+                    <!-- File Dropzone -->
+                    <div id="dropzone" class="border-2 border-dashed border-vault-300 rounded-2xl p-8 text-center bg-vault-50 hover:bg-vault-100 transition cursor-pointer" onclick="document.getElementById('file-input').click()">
+                        <input type="file" id="file-input" class="hidden" accept=".pdf, .jpg, .jpeg, .png, .webp">
+                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-vault-400 mb-3"></i>
+                        <p class="text-sm text-gray-600 font-medium">Klik atau drag & drop file ke sini</p>
+                        <p class="text-xs text-gray-400 mt-1">Mendukung PDF, JPG, PNG, WEBP (Max 5MB)</p>
+                        <div id="file-preview-name" class="mt-4 text-sm font-semibold text-vault-600 hidden"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700">Nama Dokumen <span class="text-red-500">*</span></label>
+                            <input type="text" id="doc-name" required class="w-full border border-gray-300 rounded-xl p-2.5 focus:ring-2 focus:ring-vault-500 outline-none text-sm" placeholder="Contoh: KTP Saya">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700">Kategori <span class="text-red-500">*</span></label>
+                            <select id="doc-category" required class="w-full border border-gray-300 rounded-xl p-2.5 focus:ring-2 focus:ring-vault-500 outline-none text-sm bg-white">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700">Nomor Dokumen (Opsional)</label>
+                            <input type="text" id="doc-number" class="w-full border border-gray-300 rounded-xl p-2.5 focus:ring-2 focus:ring-vault-500 outline-none text-sm" placeholder="No. KTP/KK/SIM">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700">Tanggal Terbit (Opsional)</label>
+                            <input type="date" id="doc-date" class="w-full border border-gray-300 rounded-xl p-2.5 focus:ring-2 focus:ring-vault-500 outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium text-gray-700">Keterangan (Opsional)</label>
+                        <textarea id="doc-notes" rows="2" class="w-full border border-gray-300 rounded-xl p-2.5 focus:ring-2 focus:ring-vault-500 outline-none text-sm resize-none" placeholder="Catatan tambahan..."></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+                <button onclick="closeUploadModal()" class="px-5 py-2.5 rounded-xl text-gray-600 font-medium hover:bg-gray-200 transition text-sm">Batal</button>
+                <button onclick="submitUpload()" id="btn-submit-upload" class="px-5 py-2.5 rounded-xl bg-vault-500 text-white font-medium hover:bg-vault-600 shadow-md shadow-vault-200 transition text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-upload"></i> Simpan Dokumen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Preview Modal -->
+    <div id="preview-modal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 md:p-8">
+        <div class="bg-white rounded-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden fade-in shadow-2xl relative">
+            <div class="absolute top-4 right-4 z-10 flex gap-2">
+                <a id="preview-download-btn" href="#" target="_blank" class="w-10 h-10 bg-white/90 text-gray-800 rounded-full flex items-center justify-center shadow-lg hover:bg-vault-50 hover:text-vault-600 transition">
+                    <i class="fa-solid fa-download"></i>
+                </a>
+                <button onclick="closePreviewModal()" class="w-10 h-10 bg-white/90 text-red-500 rounded-full flex items-center justify-center shadow-lg hover:bg-red-50 transition">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div id="preview-container" class="flex-1 bg-gray-100 flex items-center justify-center overflow-hidden">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm text-center fade-in">
+            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-trash-can text-2xl"></i>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-gray-900 mb-2">Hapus Dokumen?</h3>
+            <p class="text-sm text-gray-500 mb-6">Tindakan ini tidak dapat dibatalkan. File akan dihapus permanen dari brankas Anda.</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition">Batal</button>
+                <button id="confirm-delete-btn" class="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 shadow-md transition">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= FIREBASE & APP LOGIC ================= -->
+    <script type="module">
+        // --- 1. FIREBASE CONFIGURATION & INITIALIZATION ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // IMPORTANT: USER MUST FILL THIS CONFIGURATION BEFORE DEPLOYMENT
+        // Dapatkan konfigurasi ini dari Firebase Console -> Project Settings -> General -> Web App
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            // apiKey: "YOUR_API_KEY",
+            // authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            // projectId: "YOUR_PROJECT_ID",
+            // storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            // messagingSenderId: "YOUR_SENDER_ID",
+            // appId: "YOUR_APP_ID"
+        };
+        
+        // App ID handling for the immersive environment requirement
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'my-documents-vault';
+
+        // Initialize Firebase ONLY if config has properties (prevent crash if user hasn't configured)
+        let app, auth, db, storage;
+        try {
+            if(Object.keys(firebaseConfig).length > 0) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                storage = getStorage(app);
+            }
+        } catch(e) {
+            console.error("Firebase init error. Please configure firebaseConfig.", e);
+        }
+
+        // --- 2. GLOBAL STATE & CONSTANTS ---
+        let currentUser = null;
+        let isAdminRole = false;
+        let currentView = 'dashboard';
+        let unsubscribeDocs = null;
+        let allDocuments = []; // Cache for memory filtering/sorting
+
+        const CATEGORIES = [
+            { id: 'identitas', name: 'Identitas Pribadi', icon: 'fa-id-card', color: 'bg-blue-100 text-blue-600' },
+            { id: 'keluarga', name: 'Keluarga', icon: 'fa-use
