@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Documents - Digital Vault</title>
     
     <!-- Google Fonts: Poppins & Inter -->
@@ -44,104 +44,110 @@
 
     <style>
         /* Custom Scrollbar & Animations */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(244, 114, 182, 0.5); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #f9a8d4; }
         
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* Glassmorphism Panel */
         .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .glass-card {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
         
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-vault-50 text-gray-800 font-sans antialiased overflow-hidden">
+<body class="text-gray-800 font-sans antialiased overflow-hidden">
+
+    <!-- CUSTOM BACKGROUND IMAGE WITH BLUR OVERLAY -->
+    <!-- Menggunakan link export Google Drive agar gambar bisa dimuat -->
+    <div class="fixed inset-0 z-[-2]" style="background-image: url('https://drive.google.com/uc?export=view&id=1azK9RNOAVTKRJxlFdbpEanWmfyBv7-pL'); background-size: cover; background-position: center; background-attachment: fixed;"></div>
+    <!-- Efek Blur/Kaca -->
+    <div class="fixed inset-0 z-[-1] bg-white/50 backdrop-blur-xl"></div>
 
     <!-- Toast Notification -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-[90%] md:max-w-sm px-4 md:px-0"></div>
 
     <!-- ================= AUTHENTICATION VIEW ================= -->
-    <div id="auth-view" class="h-screen w-full flex items-center justify-center bg-gradient-to-br from-vault-50 to-vault-200 p-4 relative overflow-hidden">
-        
-        <!-- Ornamen Background -->
-        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-vault-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-vault-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-
-        <div class="glass-panel p-8 md:p-10 rounded-3xl shadow-xl w-full max-w-md text-center transform transition-all z-10">
+    <div id="auth-view" class="h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
+        <div class="glass-panel p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-md text-center transform transition-all z-10 border-white/50">
             <div class="mb-8">
-                <div class="w-16 h-16 bg-vault-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-vault-200">
+                <div class="w-16 h-16 bg-gradient-to-br from-vault-400 to-vault-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-vault-300">
                     <i class="fa-solid fa-shield-halved text-3xl"></i>
                 </div>
-                <h1 class="text-3xl font-display font-bold text-gray-900">Dokumen Saya</h1>
-                <p class="text-sm text-gray-500 mt-2">Brankas Dokumen Digital</p>
+                <h1 class="text-3xl font-display font-bold text-gray-900 drop-shadow-sm">Dokumen Saya</h1>
+                <p class="text-sm text-gray-700 mt-2 font-medium">Brankas Dokumen Digital</p>
             </div>
 
             <!-- Unified Login Form -->
             <div class="space-y-5 text-left">
-                <!-- Form Email/Password -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Email</label>
-                    <input type="email" id="login-email" class="w-full rounded-2xl border-gray-200 bg-gray-50/50 border p-3.5 focus:ring-2 focus:ring-vault-400 focus:border-vault-400 focus:bg-white outline-none transition-all" placeholder="nama@email.com">
+                    <label class="block text-sm font-semibold text-gray-800 mb-1.5 ml-1">Email</label>
+                    <input type="email" id="login-email" class="w-full rounded-2xl border-white/80 bg-white/60 border p-3.5 focus:ring-2 focus:ring-vault-400 outline-none transition-all placeholder-gray-400" placeholder="nama@email.com">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Password</label>
-                    <input type="password" id="login-password" class="w-full rounded-2xl border-gray-200 bg-gray-50/50 border p-3.5 focus:ring-2 focus:ring-vault-400 focus:border-vault-400 focus:bg-white outline-none transition-all" placeholder="••••••••">
+                    <label class="block text-sm font-semibold text-gray-800 mb-1.5 ml-1">Password</label>
+                    <input type="password" id="login-password" class="w-full rounded-2xl border-white/80 bg-white/60 border p-3.5 focus:ring-2 focus:ring-vault-400 outline-none transition-all placeholder-gray-400" placeholder="••••••••">
                 </div>
-                <button id="btn-email-login" class="w-full bg-vault-600 text-white rounded-2xl py-3.5 font-semibold hover:bg-vault-700 transition shadow-lg shadow-vault-200 mt-2">
+                <button id="btn-email-login" class="w-full bg-vault-600 text-white rounded-2xl py-3.5 font-bold hover:bg-vault-700 transition shadow-lg shadow-vault-300 mt-2">
                     Masuk
                 </button>
 
-                <!-- Divider -->
-                <div class="flex items-center py-2">
-                    <div class="flex-grow border-t border-gray-200"></div>
-                    <span class="px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">atau</span>
-                    <div class="flex-grow border-t border-gray-200"></div>
+                <div class="flex items-center py-2 opacity-70">
+                    <div class="flex-grow border-t border-gray-400"></div>
+                    <span class="px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">atau</span>
+                    <div class="flex-grow border-t border-gray-400"></div>
                 </div>
 
-                <!-- Google Login -->
-                <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-2xl py-3.5 px-4 text-gray-700 font-medium hover:bg-gray-50 transition shadow-sm">
+                <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-white/80 rounded-2xl py-3.5 px-4 text-gray-800 font-bold hover:bg-gray-50 transition shadow-md">
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
                     Lanjutkan dengan Google
                 </button>
             </div>
             
-            <div id="auth-loading" class="hidden mt-6 text-vault-500">
+            <div id="auth-loading" class="hidden mt-6 text-vault-600">
                 <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
             </div>
         </div>
     </div>
 
     <!-- ================= MAIN APP VIEW ================= -->
-    <div id="app-view" class="hidden h-screen w-full flex bg-vault-50">
+    <div id="app-view" class="hidden h-screen w-full flex bg-transparent">
         
         <!-- Mobile Sidebar Overlay -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
+        <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
 
         <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="bg-white w-64 h-full shadow-xl flex flex-col transition-transform transform -translate-x-full md:translate-x-0 fixed md:relative z-30 border-r border-gray-100">
-            <div class="p-6 flex items-center gap-3 border-b border-gray-50">
-                <div class="w-10 h-10 bg-vault-100 text-vault-600 rounded-xl flex items-center justify-center">
+        <aside id="sidebar" class="glass-panel w-64 md:w-72 h-full shadow-2xl flex flex-col transition-transform transform -translate-x-full md:translate-x-0 fixed md:relative z-30 border-r border-white/40">
+            <div class="p-6 flex items-center gap-3 border-b border-white/30">
+                <div class="w-12 h-12 bg-gradient-to-br from-vault-400 to-vault-600 text-white rounded-xl flex items-center justify-center shadow-md">
                     <i class="fa-solid fa-shield-halved text-xl"></i>
                 </div>
                 <div>
-                    <h2 class="font-display font-bold text-lg leading-tight text-gray-900">My Docs</h2>
-                    <p class="text-xs text-gray-400">Digital Vault</p>
+                    <h2 class="font-display font-bold text-xl leading-tight text-gray-900">My Docs</h2>
+                    <p class="text-xs text-vault-700 font-medium">Digital Vault</p>
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto hide-scroll py-4 px-3 space-y-1" id="nav-menu">
+            <div class="flex-1 overflow-y-auto hide-scroll py-4 px-4 space-y-1.5" id="nav-menu">
                 <!-- Navigation inserted via JS -->
             </div>
 
-            <div class="p-4 border-t border-gray-100">
-                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-xl transition font-medium">
+            <div class="p-4 border-t border-white/30">
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/50 text-red-600 hover:bg-red-500 hover:text-white rounded-xl transition font-bold shadow-sm">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
                 </button>
             </div>
@@ -151,37 +157,37 @@
         <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
             
             <!-- Top Header -->
-            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 md:px-8 z-10 sticky top-0">
+            <header class="h-20 glass-panel border-b border-white/40 flex items-center justify-between px-4 md:px-8 z-10 sticky top-0 rounded-b-xl md:rounded-none mx-2 md:mx-0 mt-2 md:mt-0 shadow-sm">
                 <div class="flex items-center gap-4">
-                    <button onclick="toggleSidebar()" class="md:hidden text-gray-600 hover:text-vault-600 focus:outline-none">
-                        <i class="fa-solid fa-bars text-xl"></i>
+                    <button onclick="toggleSidebar()" class="md:hidden w-10 h-10 bg-white/60 rounded-full flex items-center justify-center text-gray-700 shadow-sm focus:outline-none">
+                        <i class="fa-solid fa-bars"></i>
                     </button>
-                    <h2 id="header-title" class="font-display font-semibold text-xl text-gray-800">Dashboard</h2>
+                    <h2 id="header-title" class="font-display font-bold text-lg md:text-xl text-gray-900 drop-shadow-sm truncate max-w-[150px] md:max-w-md">Dashboard</h2>
                 </div>
                 
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 md:gap-4">
                     <div class="relative hidden md:block">
-                        <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="global-search" placeholder="Cari dokumen..." class="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-vault-300 w-64 transition-all">
+                        <i class="fa-solid fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="global-search" placeholder="Cari data..." class="pl-10 pr-4 py-2 bg-white/70 backdrop-blur border border-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-vault-400 w-56 transition-all shadow-sm">
                     </div>
                     
-                    <div class="flex items-center gap-3 border-l border-gray-200 pl-4 cursor-pointer hover:bg-gray-50 p-2 rounded-xl transition" onclick="navigate('profile')">
+                    <div class="flex items-center gap-3 md:border-l border-gray-300 md:pl-4 cursor-pointer hover:opacity-80 transition" onclick="navigate('profile')">
                         <div class="text-right hidden sm:block">
-                            <p id="user-name-display" class="text-sm font-semibold text-gray-800">User Name</p>
-                            <p id="user-role-display" class="text-xs text-gray-500">Premium Member</p>
+                            <p id="user-name-display" class="text-sm font-bold text-gray-900 drop-shadow-sm">User Name</p>
+                            <p class="text-xs text-vault-700 font-semibold">Premium</p>
                         </div>
-                        <img id="user-avatar-display" src="https://placehold.co/100x100/ec4899/ffffff?text=U" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-vault-100 shadow-sm">
+                        <img id="user-avatar-display" src="https://placehold.co/100x100/ec4899/ffffff?text=U" alt="Profile" class="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-2 border-white shadow-md">
                     </div>
                 </div>
             </header>
 
             <!-- Scrollable Content View -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-gradient-to-b from-transparent to-vault-50/50" id="main-content">
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 relative" id="main-content">
                 <!-- Dynamic Content Loaded Here -->
             </div>
             
             <!-- Floating Action Button (Upload) -->
-            <button id="fab-upload" onclick="openUploadModal()" class="fixed bottom-8 right-8 w-14 h-14 bg-vault-600 text-white rounded-full shadow-xl shadow-vault-300 flex items-center justify-center text-2xl hover:bg-vault-700 hover:scale-105 transition transform z-10 group">
+            <button id="fab-upload" onclick="openUploadModal()" class="fixed bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 bg-gradient-to-tr from-vault-600 to-vault-400 text-white rounded-full shadow-lg shadow-vault-400 flex items-center justify-center text-2xl hover:scale-110 transition transform z-10 group">
                 <i class="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
             </button>
         </main>
@@ -189,77 +195,89 @@
 
     <!-- ================= MODALS ================= -->
     
+    <!-- Modal Tambah Folder -->
+    <div id="folder-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4">
+        <div class="glass-card rounded-3xl shadow-2xl p-6 w-full max-w-sm text-center fade-in">
+            <div class="w-16 h-16 bg-vault-100 text-vault-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-vault-200 shadow-inner">
+                <i class="fa-solid fa-folder-plus text-2xl"></i>
+            </div>
+            <h3 class="font-display font-bold text-xl text-gray-900 mb-2">Buat Folder Baru</h3>
+            <p class="text-sm text-gray-600 mb-5 font-medium">Kelompokkan dokumen Anda agar lebih rapi.</p>
+            
+            <input type="text" id="new-folder-name" class="w-full bg-white border border-gray-300 rounded-xl p-3.5 mb-5 focus:ring-2 focus:ring-vault-400 outline-none text-sm font-medium shadow-sm" placeholder="Nama folder (Cth: Pekerjaan, Istri)">
+            
+            <div class="flex gap-3">
+                <button onclick="closeFolderModal()" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition">Batal</button>
+                <button onclick="submitFolder()" id="btn-submit-folder" class="flex-1 py-3 rounded-xl bg-vault-600 text-white font-bold hover:bg-vault-700 shadow-md shadow-vault-300 transition">Buat</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Upload Modal -->
-    <div id="upload-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden fade-in">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <h3 class="font-display font-semibold text-lg text-gray-800">Upload Dokumen Baru</h3>
-                <button onclick="closeUploadModal()" class="text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+    <div id="upload-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+        <div class="bg-white/95 backdrop-blur-md rounded-t-3xl md:rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden fade-in border border-white/50">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-white/50">
+                <h3 class="font-display font-bold text-lg text-gray-900">Upload Dokumen Baru</h3>
+                <button onclick="closeUploadModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-500 transition"><i class="fa-solid fa-times"></i></button>
             </div>
             
             <div class="p-6 overflow-y-auto flex-1 hide-scroll">
                 <form id="upload-form" class="space-y-5">
                     <!-- File Dropzone -->
-                    <div id="dropzone" class="border-2 border-dashed border-vault-300 rounded-2xl p-8 text-center bg-vault-50 hover:bg-vault-100 transition cursor-pointer" onclick="document.getElementById('file-input').click()">
+                    <div id="dropzone" class="border-2 border-dashed border-vault-400 rounded-2xl p-6 md:p-8 text-center bg-vault-50/50 hover:bg-vault-100/50 transition cursor-pointer" onclick="document.getElementById('file-input').click()">
                         <input type="file" id="file-input" class="hidden" accept=".pdf, .jpg, .jpeg, .png, .webp">
-                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-vault-400 mb-3"></i>
-                        <p class="text-sm text-gray-600 font-medium">Klik atau drag & drop file ke sini</p>
-                        <p class="text-xs text-gray-400 mt-1">Mendukung PDF, JPG, PNG, WEBP (Max 5MB)</p>
-                        <div id="file-preview-name" class="mt-4 text-sm font-semibold text-vault-600 hidden bg-white py-2 px-4 rounded-lg shadow-sm border border-vault-100 inline-block"></div>
+                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-vault-500 mb-3 drop-shadow-sm"></i>
+                        <p class="text-sm text-gray-700 font-bold">Tap atau pilih file di sini</p>
+                        <p class="text-xs text-gray-500 mt-1 font-medium">Mendukung PDF & Gambar (Max 5MB)</p>
+                        <div id="file-preview-name" class="mt-4 text-sm font-bold text-vault-700 hidden bg-white py-2 px-4 rounded-xl shadow-sm border border-vault-200 inline-block"></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium text-gray-700">Nama Dokumen <span class="text-red-500">*</span></label>
-                            <input type="text" id="doc-name" required class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-vault-400 outline-none text-sm transition" placeholder="Contoh: KTP Saya">
+                        <div class="space-y-1.5">
+                            <label class="text-sm font-bold text-gray-800">Nama Dokumen <span class="text-red-500">*</span></label>
+                            <input type="text" id="doc-name" required class="w-full bg-white border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-vault-400 outline-none text-sm transition shadow-sm" placeholder="Cth: SK Karyawan Tetap">
                         </div>
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium text-gray-700">Kategori <span class="text-red-500">*</span></label>
-                            <select id="doc-category" required class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-vault-400 outline-none text-sm bg-white transition">
-                                <!-- Populated via JS -->
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium text-gray-700">Nomor Dokumen (Opsional)</label>
-                            <input type="text" id="doc-number" class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-vault-400 outline-none text-sm transition" placeholder="No. KTP/KK/SIM">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium text-gray-700">Tanggal Terbit (Opsional)</label>
-                            <input type="date" id="doc-date" class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-vault-400 outline-none text-sm transition">
+                        <div class="space-y-1.5">
+                            <label class="text-sm font-bold text-gray-800">Pilih Folder <span class="text-red-500">*</span></label>
+                            <div class="flex gap-2">
+                                <select id="doc-folder" required class="flex-1 bg-white border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-vault-400 outline-none text-sm transition shadow-sm font-medium">
+                                    <!-- Populated via JS -->
+                                </select>
+                                <button type="button" onclick="openFolderModal()" class="w-12 h-12 bg-vault-100 text-vault-600 rounded-xl flex items-center justify-center hover:bg-vault-200 transition border border-vault-200" title="Buat Folder Baru">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700">Keterangan (Opsional)</label>
-                        <textarea id="doc-notes" rows="2" class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-vault-400 outline-none text-sm resize-none transition" placeholder="Catatan tambahan..."></textarea>
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-sm font-bold text-gray-800">Keterangan Tambahan (Opsional)</label>
+                        <textarea id="doc-notes" rows="2" class="w-full bg-white border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-vault-400 outline-none text-sm resize-none transition shadow-sm" placeholder="Catatan singkat..."></textarea>
                     </div>
                 </form>
             </div>
             
-            <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
-                <button onclick="closeUploadModal()" class="px-5 py-2.5 rounded-xl text-gray-600 font-medium hover:bg-gray-200 transition text-sm">Batal</button>
-                <button onclick="submitUpload()" id="btn-submit-upload" class="px-5 py-2.5 rounded-xl bg-vault-600 text-white font-medium hover:bg-vault-700 shadow-md shadow-vault-200 transition text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-upload"></i> Simpan Dokumen
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 bg-gray-50/80">
+                <button onclick="closeUploadModal()" class="px-5 py-3 rounded-xl bg-white border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition text-sm shadow-sm">Batal</button>
+                <button onclick="submitUpload()" id="btn-submit-upload" class="px-5 py-3 rounded-xl bg-vault-600 text-white font-bold hover:bg-vault-700 shadow-md shadow-vault-300 transition text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-upload"></i> Simpan Data
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Document Preview Modal -->
-    <div id="preview-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4 md:p-8">
-        <div class="bg-white rounded-2xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden fade-in shadow-2xl relative">
-            <div class="absolute top-4 right-4 z-10 flex gap-2">
-                <a id="preview-download-btn" href="#" target="_blank" class="w-10 h-10 bg-white/90 text-gray-800 rounded-full flex items-center justify-center shadow-lg hover:bg-vault-50 hover:text-vault-600 transition">
+    <div id="preview-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-lg hidden z-50 flex items-center justify-center p-2 md:p-8">
+        <div class="bg-black/20 rounded-2xl w-full max-w-5xl h-[95vh] md:h-[90vh] flex flex-col overflow-hidden fade-in relative">
+            <div class="absolute top-4 right-4 z-10 flex gap-3">
+                <a id="preview-download-btn" href="#" target="_blank" class="w-10 h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-md border border-white/40 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-white/40 transition text-lg">
                     <i class="fa-solid fa-download"></i>
                 </a>
-                <button onclick="closePreviewModal()" class="w-10 h-10 bg-white/90 text-red-500 rounded-full flex items-center justify-center shadow-lg hover:bg-red-50 transition">
+                <button onclick="closePreviewModal()" class="w-10 h-10 md:w-12 md:h-12 bg-red-500/80 backdrop-blur-md border border-red-400/50 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition text-lg">
                     <i class="fa-solid fa-times"></i>
                 </button>
             </div>
-            <div id="preview-container" class="flex-1 bg-gray-100 flex items-center justify-center overflow-hidden">
+            <div id="preview-container" class="flex-1 flex items-center justify-center overflow-hidden p-2">
                 <!-- Content injected via JS -->
             </div>
         </div>
@@ -267,22 +285,21 @@
 
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm text-center fade-in">
-            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-red-100">
+        <div class="glass-card rounded-3xl shadow-2xl p-6 w-full max-w-sm text-center fade-in">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
                 <i class="fa-solid fa-trash-can text-2xl"></i>
             </div>
-            <h3 class="font-display font-semibold text-lg text-gray-900 mb-2">Hapus Dokumen?</h3>
-            <p class="text-sm text-gray-500 mb-6">Tindakan ini tidak dapat dibatalkan. File akan dihapus permanen dari brankas Anda.</p>
+            <h3 class="font-display font-bold text-lg text-gray-900 mb-2">Hapus Data?</h3>
+            <p class="text-sm text-gray-600 font-medium mb-6">Tindakan ini tidak dapat dibatalkan. File akan dihapus permanen.</p>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition">Batal</button>
-                <button id="confirm-delete-btn" class="flex-1 py-3 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 shadow-md shadow-red-200 transition">Ya, Hapus</button>
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-white border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition shadow-sm">Batal</button>
+                <button id="confirm-delete-btn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 shadow-md shadow-red-300 transition">Ya, Hapus</button>
             </div>
         </div>
     </div>
 
     <!-- ================= FIREBASE & APP LOGIC ================= -->
     <script type="module">
-        // --- 1. FIREBASE CONFIGURATION & INITIALIZATION ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -303,52 +320,31 @@
 
         let app, auth, db, storage;
         try {
-            if(Object.keys(firebaseConfig).length > 0) {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                storage = getStorage(app);
-            }
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
         } catch(e) {
-            console.error("Firebase init error. Please configure firebaseConfig.", e);
+            console.error("Firebase init error.", e);
         }
 
-        // --- 2. GLOBAL STATE & CONSTANTS ---
+        // --- GLOBAL STATE ---
         let currentUser = null;
         let currentView = 'dashboard';
         let unsubscribeDocs = null;
+        let unsubscribeFolders = null;
         let allDocuments = [];
+        let allFolders = [];
 
-        const CATEGORIES = [
-            { id: 'identitas', name: 'Identitas Pribadi', icon: 'fa-id-card', color: 'bg-blue-100 text-blue-600' },
-            { id: 'keluarga', name: 'Keluarga', icon: 'fa-users', color: 'bg-green-100 text-green-600' },
-            { id: 'pendidikan', name: 'Pendidikan', icon: 'fa-graduation-cap', color: 'bg-purple-100 text-purple-600' },
-            { id: 'pekerjaan', name: 'Pekerjaan', icon: 'fa-briefcase', color: 'bg-orange-100 text-orange-600' },
-            { id: 'kendaraan', name: 'Kendaraan', icon: 'fa-car', color: 'bg-red-100 text-red-600' },
-            { id: 'properti', name: 'Properti', icon: 'fa-house', color: 'bg-teal-100 text-teal-600' },
-            { id: 'keuangan', name: 'Keuangan', icon: 'fa-wallet', color: 'bg-yellow-100 text-yellow-600' },
-            { id: 'kesehatan', name: 'Kesehatan', icon: 'fa-heart-pulse', color: 'bg-rose-100 text-rose-600' },
-            { id: 'lainnya', name: 'Lainnya', icon: 'fa-folder', color: 'bg-gray-100 text-gray-600' }
-        ];
-
-        // --- 3. UI UTILITIES ---
-        function showToast(message, type = 'success') {
+        // --- UI UTILITIES ---
+        window.showToast = (message, type = 'success') => {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
-            const colors = {
-                success: 'bg-white border-l-4 border-green-500 text-gray-700',
-                error: 'bg-white border-l-4 border-red-500 text-gray-700',
-                info: 'bg-white border-l-4 border-vault-500 text-gray-700'
-            };
-            const icons = {
-                success: '<i class="fa-solid fa-circle-check text-green-500"></i>',
-                error: '<i class="fa-solid fa-circle-exclamation text-red-500"></i>',
-                info: '<i class="fa-solid fa-circle-info text-vault-500"></i>'
-            };
+            const bg = type === 'error' ? 'bg-red-500' : 'bg-gray-800';
+            const icon = type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check';
 
-            toast.className = `${colors[type]} p-4 rounded-xl shadow-lg flex items-center gap-3 fade-in max-w-sm pointer-events-auto`;
-            toast.innerHTML = `${icons[type]} <span class="font-medium text-sm">${message}</span>`;
+            toast.className = `${bg} text-white p-4 rounded-2xl shadow-xl flex items-center gap-3 fade-in pointer-events-auto font-medium text-sm`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i> <span>${message}</span>`;
             
             container.appendChild(toast);
             setTimeout(() => {
@@ -357,47 +353,32 @@
                 toast.style.transition = 'all 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
-        }
-
-        window.toggleSidebar = () => {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
         };
 
-        // --- 4. AUTHENTICATION LOGIC ---
-        const handleAuthChange = async (user) => {
-            if (!db) {
-                showToast("Firebase belum dikonfigurasi. Harap isi konfigurasi di kode.", "error");
-                return;
-            }
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        };
 
+        // --- AUTH LOGIC ---
+        const handleAuthChange = async (user) => {
             if (user) {
                 currentUser = user;
-                
-                // Update profile minimal di background
-                const userRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info');
-                await setDoc(userRef, {
-                    uid: user.uid,
-                    name: user.displayName || user.email.split('@')[0],
-                    email: user.email,
-                    photoURL: user.photoURL || `https://placehold.co/100x100/ec4899/ffffff?text=${(user.email||'U').charAt(0).toUpperCase()}`,
-                    lastLogin: serverTimestamp()
-                }, { merge: true });
+                const name = user.displayName || user.email.split('@')[0];
+                document.getElementById('user-name-display').textContent = name;
+                document.getElementById('user-avatar-display').src = user.photoURL || `https://placehold.co/100x100/ec4899/ffffff?text=${name.charAt(0).toUpperCase()}`;
 
-                updateUIForUser();
-                buildNavigation();
-                navigate('dashboard');
-                
                 document.getElementById('auth-view').classList.add('hidden');
                 document.getElementById('app-view').classList.remove('hidden');
                 
+                listenToFolders();
                 listenToDocuments();
             } else {
                 currentUser = null;
                 if(unsubscribeDocs) unsubscribeDocs();
+                if(unsubscribeFolders) unsubscribeFolders();
                 allDocuments = [];
+                allFolders = [];
                 
                 document.getElementById('auth-view').classList.remove('hidden');
                 document.getElementById('app-view').classList.add('hidden');
@@ -405,241 +386,215 @@
             document.getElementById('auth-loading').classList.add('hidden');
         };
 
-        if(typeof firebaseConfig.apiKey !== 'undefined') {
-            onAuthStateChanged(auth, handleAuthChange);
-        } else {
-            setTimeout(() => showToast("Mode Preview: Firebase belum dikonfigurasi", "info"), 1000);
-        }
+        onAuthStateChanged(auth, handleAuthChange);
 
-        // Login Manual (Email & Password)
         document.getElementById('btn-email-login')?.addEventListener('click', async () => {
-            if(!auth) return alert("Firebase not configured!");
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             if(!email || !password) return showToast("Email dan Password wajib diisi", "error");
-            
             document.getElementById('auth-loading').classList.remove('hidden');
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                showToast("Login gagal. Periksa email dan password Anda.", "error");
-                document.getElementById('auth-loading').classList.add('hidden');
-            }
+            try { await signInWithEmailAndPassword(auth, email, password); } 
+            catch (e) { showToast("Gagal login.", "error"); document.getElementById('auth-loading').classList.add('hidden'); }
         });
 
-        // Login Google
         document.getElementById('btn-google-login')?.addEventListener('click', async () => {
-            if(!auth) return alert("Firebase not configured!");
             document.getElementById('auth-loading').classList.remove('hidden');
-            const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error(error);
-                showToast(error.message, "error");
-                document.getElementById('auth-loading').classList.add('hidden');
-            }
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
+            catch (e) { showToast("Gagal login Google", "error"); document.getElementById('auth-loading').classList.add('hidden'); }
         });
 
         window.handleLogout = async () => {
-            try {
-                await signOut(auth);
-                showToast("Berhasil keluar.");
-            } catch (error) {
-                showToast("Gagal keluar.", "error");
-            }
+            try { await signOut(auth); } catch (e) {}
         };
 
-        // --- 5. NAVIGATION & RENDER LOGIC ---
-        function updateUIForUser() {
+        // --- DYNAMIC FOLDERS LOGIC ---
+        function listenToFolders() {
             if(!currentUser) return;
-            const name = currentUser.displayName || currentUser.email.split('@')[0];
-            const photo = currentUser.photoURL || `https://placehold.co/100x100/ec4899/ffffff?text=${name.charAt(0).toUpperCase()}`;
-            
-            document.getElementById('user-name-display').textContent = name;
-            document.getElementById('user-avatar-display').src = photo;
-            
-            const select = document.getElementById('doc-category');
-            select.innerHTML = '<option value="">Pilih Kategori...</option>';
-            CATEGORIES.forEach(cat => {
-                select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+            const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'folders'), orderBy('createdAt', 'desc'));
+            unsubscribeFolders = onSnapshot(q, (snapshot) => {
+                allFolders = [];
+                snapshot.forEach(doc => allFolders.push({ id: doc.id, ...doc.data() }));
+                buildNavigation();
+                updateUploadFolderDropdown();
+                if(currentView === 'dashboard') renderDashboard();
             });
         }
 
+        function updateUploadFolderDropdown() {
+            const select = document.getElementById('doc-folder');
+            select.innerHTML = '';
+            if(allFolders.length === 0) {
+                select.innerHTML = '<option value="none">Tanpa Folder (Umum)</option>';
+            } else {
+                allFolders.forEach(f => {
+                    select.innerHTML += `<option value="${f.id}">${f.name}</option>`;
+                });
+            }
+        }
+
+        window.openFolderModal = () => {
+            document.getElementById('folder-modal').classList.remove('hidden');
+            document.getElementById('new-folder-name').value = '';
+            document.getElementById('new-folder-name').focus();
+        };
+        window.closeFolderModal = () => document.getElementById('folder-modal').classList.add('hidden');
+
+        window.submitFolder = async () => {
+            const name = document.getElementById('new-folder-name').value.trim();
+            if(!name) return showToast("Nama folder harus diisi", "error");
+            
+            const btn = document.getElementById('btn-submit-folder');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'folders'), {
+                    name: name,
+                    createdAt: serverTimestamp()
+                });
+                showToast("Folder berhasil dibuat!");
+                closeFolderModal();
+            } catch(e) {
+                showToast("Gagal membuat folder", "error");
+            } finally {
+                btn.innerHTML = 'Buat';
+                btn.disabled = false;
+            }
+        };
+
+        // --- NAVIGATION LOGIC ---
         function buildNavigation() {
             const nav = document.getElementById('nav-menu');
             let html = `
-                <a href="#dashboard" onclick="navigate('dashboard')" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-gray-600 hover:bg-vault-100 hover:text-vault-700" data-view="dashboard">
-                    <i class="fa-solid fa-chart-pie w-5 text-center"></i> <span class="font-medium text-sm">Dashboard</span>
+                <a href="#dashboard" onclick="navigate('dashboard')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition text-gray-700 font-medium hover:bg-white/60 hover:shadow-sm" data-view="dashboard">
+                    <i class="fa-solid fa-house w-6 text-center text-vault-600"></i> <span>Dashboard Utama</span>
                 </a>
-                <a href="#all" onclick="navigate('all')" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-gray-600 hover:bg-vault-100 hover:text-vault-700" data-view="all">
-                    <i class="fa-solid fa-folder-open w-5 text-center"></i> <span class="font-medium text-sm">Semua Dokumen</span>
+                <a href="#all" onclick="navigate('all')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition text-gray-700 font-medium hover:bg-white/60 hover:shadow-sm" data-view="all">
+                    <i class="fa-solid fa-database w-6 text-center text-vault-600"></i> <span>Semua Data</span>
                 </a>
-                <div class="pt-4 pb-1 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategori</div>
+                
+                <div class="mt-6 mb-2 px-4 flex justify-between items-center">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Folder Saya</span>
+                    <button onclick="openFolderModal()" class="text-vault-600 hover:text-vault-800 transition p-1"><i class="fa-solid fa-plus"></i></button>
+                </div>
             `;
             
-            CATEGORIES.forEach(cat => {
-                html += `
-                    <a href="#cat-${cat.id}" onclick="navigate('category', '${cat.id}')" class="nav-item flex items-center justify-between px-4 py-2 rounded-xl transition text-gray-600 hover:bg-vault-50 hover:text-vault-600 group" data-view="cat-${cat.id}">
-                        <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded flex items-center justify-center ${cat.color} bg-opacity-30 group-hover:bg-opacity-50 transition">
-                                <i class="fa-solid ${cat.icon} text-xs"></i>
-                            </div>
-                            <span class="text-sm font-medium">${cat.name}</span>
-                        </div>
-                    </a>
-                `;
-            });
+            if(allFolders.length === 0) {
+                html += `<div class="px-4 py-2 text-xs text-gray-400 font-medium italic">Belum ada folder.</div>`;
+            } else {
+                allFolders.forEach(f => {
+                    html += `
+                        <a href="#folder-${f.id}" onclick="navigate('folder', '${f.id}')" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-gray-700 font-medium hover:bg-white/60 group" data-view="folder-${f.id}">
+                            <i class="fa-solid fa-folder text-vault-400 group-hover:text-vault-500 transition"></i>
+                            <span class="truncate">${f.name}</span>
+                        </a>
+                    `;
+                });
+            }
 
             html += `
-                <div class="pt-4 pb-1 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Lainnya</div>
-                <a href="#favorites" onclick="navigate('favorites')" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-gray-600 hover:bg-yellow-50 hover:text-yellow-600" data-view="favorites">
-                    <i class="fa-solid fa-star w-5 text-center text-yellow-400"></i> <span class="font-medium text-sm">Favorit</span>
-                </a>
-                <a href="#profile" onclick="navigate('profile')" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-gray-600 hover:bg-vault-50 hover:text-vault-600" data-view="profile">
-                    <i class="fa-solid fa-user w-5 text-center"></i> <span class="font-medium text-sm">Profil Pengguna</span>
+                <div class="mt-6 mb-2 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Lainnya</div>
+                <a href="#favorites" onclick="navigate('favorites')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition text-gray-700 font-medium hover:bg-white/60 hover:shadow-sm" data-view="favorites">
+                    <i class="fa-solid fa-star w-6 text-center text-yellow-500"></i> <span>Favorit</span>
                 </a>
             `;
-
             nav.innerHTML = html;
+            highlightNav(currentView);
+        }
+
+        function highlightNav(view, param=null) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-white/80', 'shadow-sm', 'border', 'border-white/50'));
+            let activeTarget = view === 'folder' ? `folder-${param}` : view;
+            const activeEl = document.querySelector(`.nav-item[data-view="${activeTarget}"]`);
+            if(activeEl) activeEl.classList.add('bg-white/80', 'shadow-sm', 'border', 'border-white/50');
         }
 
         window.navigate = (view, param = null) => {
             currentView = view;
-            const content = document.getElementById('main-content');
-            const title = document.getElementById('header-title');
-            const fab = document.getElementById('fab-upload');
+            highlightNav(view, param);
             
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-vault-100', 'text-vault-700', 'font-semibold'));
-            let activeTarget = view === 'category' ? `cat-${param}` : view;
-            const activeEl = document.querySelector(`.nav-item[data-view="${activeTarget}"]`);
-            if(activeEl) activeEl.classList.add('bg-vault-100', 'text-vault-700', 'font-semibold');
-
+            const title = document.getElementById('header-title');
             if(window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.add('-translate-x-full');
                 document.getElementById('sidebar-overlay').classList.add('hidden');
             }
 
-            content.innerHTML = '<div class="flex justify-center py-20"><i class="fa-solid fa-spinner fa-spin text-vault-400 text-3xl"></i></div>';
-            fab.style.display = view === 'profile' ? 'none' : 'flex';
-
-            setTimeout(() => {
-                if(view === 'dashboard') {
-                    title.textContent = 'Dashboard Utama';
-                    renderDashboard();
-                } else if(view === 'all') {
-                    title.textContent = 'Semua Dokumen';
-                    renderDocumentList(allDocuments);
-                } else if(view === 'category') {
-                    const catInfo = CATEGORIES.find(c => c.id === param);
-                    title.textContent = `Kategori: ${catInfo?.name || 'Dokumen'}`;
-                    const filtered = allDocuments.filter(d => d.categoryId === param);
-                    renderDocumentList(filtered, catInfo);
-                } else if(view === 'favorites') {
-                    title.textContent = 'Dokumen Favorit';
-                    const filtered = allDocuments.filter(d => d.isFavorite);
-                    renderDocumentList(filtered);
-                } else if(view === 'profile') {
-                    title.textContent = 'Profil Pengguna';
-                    renderProfile();
-                }
-            }, 100);
+            if(view === 'dashboard') { title.textContent = 'Dashboard Utama'; renderDashboard(); }
+            else if(view === 'all') { title.textContent = 'Semua Data'; renderDocumentList(allDocuments); }
+            else if(view === 'folder') { 
+                const folder = allFolders.find(f => f.id === param);
+                title.textContent = folder ? folder.name : 'Folder';
+                renderDocumentList(allDocuments.filter(d => d.folderId === param), folder); 
+            }
+            else if(view === 'favorites') { title.textContent = 'Data Favorit'; renderDocumentList(allDocuments.filter(d => d.isFavorite)); }
+            else if(view === 'profile') { title.textContent = 'Profil Pengguna'; renderProfile(); }
         };
 
-        // --- 6. DATA FETCHING & RENDERING ---
+        // --- DOCUMENTS FETCH & RENDER ---
         function listenToDocuments() {
             if(!currentUser) return;
-            
-            const q = query(
-                collection(db, 'artifacts', appId, 'users', currentUser.uid, 'documents'),
-                orderBy('createdAt', 'desc')
-            );
-            
+            const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'documents'), orderBy('createdAt', 'desc'));
             unsubscribeDocs = onSnapshot(q, (snapshot) => {
                 allDocuments = [];
-                snapshot.forEach((doc) => {
-                    allDocuments.push({ id: doc.id, ...doc.data() });
-                });
-                
-                navigate(currentView, currentView === 'category' ? document.querySelector('.nav-item.bg-vault-100')?.dataset.view.replace('cat-','') : null);
-            }, (error) => {
-                console.error("Error fetching docs: ", error);
-                showToast("Gagal memuat dokumen.", "error");
+                snapshot.forEach(doc => allFolders.push(allDocuments.push({ id: doc.id, ...doc.data() })));
+                navigate(currentView, currentView === 'folder' ? document.querySelector('.nav-item.bg-white\\/80')?.dataset.view.replace('folder-','') : null);
             });
         }
 
         function renderDashboard() {
             const content = document.getElementById('main-content');
-            const totalDocs = allDocuments.length;
-            const recentDocs = allDocuments.slice(0, 4);
-            const favCount = allDocuments.filter(d => d.isFavorite).length;
-
+            
             let html = `
                 <div class="mb-8 fade-in">
-                    <h1 class="text-2xl md:text-3xl font-display font-bold text-gray-800">Halo, ${currentUser.displayName?.split(' ')[0] || 'Pengguna'}! 👋</h1>
-                    <p class="text-gray-500 mt-1 text-sm md:text-base">Selamat datang di brankas dokumen digital Anda. Semua aman terkendali.</p>
+                    <h1 class="text-3xl font-display font-bold text-gray-900 drop-shadow-md">Data & Dokumen</h1>
+                    <p class="text-gray-800 mt-1 font-medium bg-white/40 inline-block px-3 py-1 rounded-full backdrop-blur-sm border border-white/30 text-sm shadow-sm">Total: ${allDocuments.length} file tersimpan.</p>
                 </div>
+            `;
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 fade-in" style="animation-delay: 0.1s;">
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium mb-1">Total Dokumen</p>
-                            <h3 class="text-3xl font-display font-bold text-gray-800">${totalDocs}</h3>
+            // FOLDER GRID
+            if(allFolders.length > 0) {
+                html += `
+                    <div class="mb-8 fade-in" style="animation-delay: 0.1s;">
+                        <div class="flex justify-between items-end mb-4">
+                            <h3 class="font-display font-bold text-lg text-gray-900 drop-shadow-sm">Folder Saya</h3>
                         </div>
-                        <div class="w-12 h-12 bg-vault-100 text-vault-600 rounded-full flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-file-lines"></i>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                            ${allFolders.map(f => {
+                                const count = allDocuments.filter(d => d.folderId === f.id).length;
+                                return `
+                                <div onclick="navigate('folder', '${f.id}')" class="glass-card rounded-2xl p-4 md:p-5 cursor-pointer hover:-translate-y-1 transition transform group shadow-sm hover:shadow-md">
+                                    <div class="w-10 h-10 md:w-12 md:h-12 bg-vault-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-vault-200 transition">
+                                        <i class="fa-solid fa-folder text-xl md:text-2xl text-vault-500"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-900 truncate text-sm md:text-base">${f.name}</h4>
+                                    <p class="text-xs text-gray-500 font-medium mt-1">${count} file</p>
+                                </div>
+                                `;
+                            }).join('')}
                         </div>
                     </div>
-                    
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium mb-1">Kategori Aktif</p>
-                            <h3 class="text-3xl font-display font-bold text-gray-800">${new Set(allDocuments.map(d=>d.categoryId)).size}</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-layer-group"></i>
-                        </div>
-                    </div>
+                `;
+            }
 
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium mb-1">Dokumen Favorit</p>
-                            <h3 class="text-3xl font-display font-bold text-gray-800">${favCount}</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-star"></i>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition cursor-pointer" onclick="openUploadModal()">
-                        <div>
-                            <p class="text-vault-600 text-sm font-medium mb-1">Aksi Cepat</p>
-                            <h3 class="text-lg font-display font-bold text-gray-800">Upload Baru</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-vault-500 text-white rounded-full flex items-center justify-center text-xl shadow-md shadow-vault-200">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                    </div>
-                </div>
-
+            // RECENT DOCS GRID
+            html += `
                 <div class="fade-in" style="animation-delay: 0.2s;">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-display font-semibold text-lg text-gray-800">Dokumen Terbaru</h3>
-                        <button onclick="navigate('all')" class="text-sm font-medium text-vault-600 hover:text-vault-700">Lihat Semua</button>
+                        <h3 class="font-display font-bold text-lg text-gray-900 drop-shadow-sm">Semua Data Terbaru</h3>
+                        <button onclick="navigate('all')" class="text-sm font-bold text-vault-700 hover:text-vault-900 bg-white/50 px-3 py-1 rounded-full backdrop-blur-sm shadow-sm transition">Lihat Semua</button>
                     </div>
-                    
-                    ${recentDocs.length === 0 ? `
-                        <div class="bg-white border border-dashed border-gray-300 rounded-2xl p-10 text-center">
-                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
-                                <i class="fa-solid fa-folder-open text-2xl"></i>
+                    ${allDocuments.length === 0 ? `
+                        <div class="glass-card rounded-3xl p-8 text-center border-dashed border-2 border-white/60">
+                            <div class="w-16 h-16 bg-white/50 rounded-full flex items-center justify-center mx-auto mb-3 text-vault-400 shadow-inner">
+                                <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
                             </div>
-                            <h4 class="text-gray-700 font-medium">Belum ada dokumen</h4>
-                            <p class="text-sm text-gray-500 mt-1">Mulai simpan KTP atau dokumen penting Anda di sini.</p>
-                            <button onclick="openUploadModal()" class="mt-4 px-4 py-2 bg-vault-100 text-vault-700 rounded-xl text-sm font-medium hover:bg-vault-200 transition">Upload Pertama</button>
+                            <h4 class="text-gray-900 font-bold text-lg">Brankas Masih Kosong</h4>
+                            <p class="text-sm text-gray-600 mt-1 font-medium mb-4">Mulai amankan KTP, KK, atau data penting Anda.</p>
+                            <button onclick="openUploadModal()" class="px-5 py-2.5 bg-vault-600 text-white rounded-xl text-sm font-bold shadow-md hover:bg-vault-700 transition">Upload File Pertama</button>
                         </div>
                     ` : `
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            ${recentDocs.map(doc => createDocumentCard(doc)).join('')}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            ${allDocuments.slice(0, 8).map(doc => createDocumentCard(doc)).join('')}
                         </div>
                     `}
                 </div>
@@ -647,19 +602,19 @@
             content.innerHTML = html;
         }
 
-        function renderDocumentList(docs, categoryInfo = null) {
+        function renderDocumentList(docs, folderInfo = null) {
             const content = document.getElementById('main-content');
-            
             let html = '';
-            if (categoryInfo) {
+            
+            if (folderInfo) {
                 html += `
-                    <div class="mb-6 flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 fade-in">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center ${categoryInfo.color} bg-opacity-20">
-                            <i class="fa-solid ${categoryInfo.icon} text-xl"></i>
+                    <div class="mb-6 flex items-center gap-4 glass-card p-5 rounded-3xl shadow-md fade-in">
+                        <div class="w-14 h-14 rounded-2xl bg-vault-100 flex items-center justify-center border border-white">
+                            <i class="fa-solid fa-folder-open text-2xl text-vault-500"></i>
                         </div>
                         <div>
-                            <h2 class="font-display font-bold text-gray-800">${categoryInfo.name}</h2>
-                            <p class="text-sm text-gray-500">${docs.length} dokumen tersimpan</p>
+                            <h2 class="font-display font-bold text-xl text-gray-900">${folderInfo.name}</h2>
+                            <p class="text-sm text-gray-600 font-medium">${docs.length} file tersimpan di sini</p>
                         </div>
                     </div>
                 `;
@@ -667,14 +622,14 @@
 
             if(docs.length === 0) {
                 html += `
-                    <div class="flex flex-col items-center justify-center h-64 text-center fade-in">
-                        <i class="fa-regular fa-folder-open text-6xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500 font-medium">Tidak ada dokumen ditemukan di sini.</p>
+                    <div class="flex flex-col items-center justify-center h-[50vh] text-center fade-in">
+                        <i class="fa-solid fa-box-open text-6xl text-white/70 drop-shadow-md mb-4"></i>
+                        <p class="text-gray-800 font-bold text-lg bg-white/50 px-4 py-2 rounded-xl backdrop-blur-sm shadow-sm">Belum ada data di sini.</p>
                     </div>
                 `;
             } else {
                 html += `
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 fade-in">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 fade-in">
                         ${docs.map(doc => createDocumentCard(doc)).join('')}
                     </div>
                 `;
@@ -685,40 +640,44 @@
         function createDocumentCard(doc) {
             const date = new Date(doc.createdAt?.toDate() || Date.now()).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
             const isPdf = doc.fileType === 'application/pdf';
-            const iconClass = isPdf ? 'fa-file-pdf text-red-500' : 'fa-image text-blue-500';
-            const catInfo = CATEGORIES.find(c => c.id === doc.categoryId) || CATEGORIES[CATEGORIES.length-1];
+            const folder = allFolders.find(f => f.id === doc.folderId);
+            const folderName = folder ? folder.name : 'Umum';
 
             return `
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden flex flex-col h-full relative">
-                    <button onclick="toggleFavorite('${doc.id}', ${!doc.isFavorite})" class="absolute top-3 right-3 z-10 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-yellow-500 shadow-sm transition ${doc.isFavorite ? 'text-yellow-400' : ''}">
+                <div class="glass-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col h-full relative border border-white/60">
+                    <button onclick="toggleFavorite('${doc.id}', ${!doc.isFavorite})" class="absolute top-2 right-2 z-10 w-9 h-9 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center text-white/70 hover:text-yellow-400 hover:bg-black/50 shadow-sm transition ${doc.isFavorite ? 'text-yellow-400 bg-black/50' : ''}">
                         <i class="fa-solid fa-star ${doc.isFavorite ? '' : 'fa-regular'}"></i>
                     </button>
 
-                    <div class="h-32 bg-gray-50 border-b border-gray-100 flex items-center justify-center relative overflow-hidden group-hover:bg-gray-100 transition cursor-pointer" onclick="openPreview('${doc.id}')">
+                    <div class="h-36 bg-gray-100 flex items-center justify-center relative overflow-hidden group-hover:bg-gray-200 transition cursor-pointer" onclick="openPreview('${doc.id}')">
                         ${isPdf ? `
-                            <i class="fa-solid ${iconClass} text-5xl opacity-50"></i>
-                            <div class="absolute bottom-2 right-2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded font-medium">PDF</div>
+                            <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+                                <i class="fa-solid fa-file-pdf text-5xl text-red-400 drop-shadow-sm"></i>
+                            </div>
+                            <div class="absolute bottom-2 right-2 bg-red-500/90 backdrop-blur text-white text-[10px] px-2.5 py-1 rounded-md font-bold uppercase shadow-sm">PDF</div>
                         ` : `
-                            <img src="${doc.fileUrl}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-300" loading="lazy">
+                            <img src="${doc.fileUrl}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" loading="lazy">
                         `}
                         
-                        <div class="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-vault-600 shadow-lg transform scale-50 group-hover:scale-100 transition-transform">
-                                <i class="fa-solid fa-eye"></i>
+                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                            <div class="w-12 h-12 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-vault-600 shadow-xl transform scale-50 group-hover:scale-100 transition-transform duration-300">
+                                <i class="fa-solid fa-expand text-lg"></i>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="p-4 flex-1 flex flex-col">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${catInfo.color} bg-opacity-20 uppercase tracking-wider">${catInfo.name}</span>
+                    <div class="p-4 flex-1 flex flex-col bg-white/60 backdrop-blur-sm">
+                        <div class="flex items-center gap-1.5 mb-1.5">
+                            <i class="fa-solid fa-folder text-[10px] text-vault-500"></i>
+                            <span class="text-[10px] font-bold text-vault-600 uppercase tracking-wider truncate">${folderName}</span>
                         </div>
-                        <h4 class="font-display font-semibold text-gray-800 text-sm line-clamp-2 flex-1 cursor-pointer hover:text-vault-600 transition" onclick="openPreview('${doc.id}')">${doc.name}</h4>
-                        <div class="mt-3 flex items-center justify-between text-xs text-gray-500 border-t border-gray-50 pt-3">
-                            <span><i class="fa-regular fa-calendar mr-1"></i> ${date}</span>
+                        <h4 class="font-display font-bold text-gray-900 text-sm leading-tight line-clamp-2 flex-1 cursor-pointer group-hover:text-vault-700 transition" onclick="openPreview('${doc.id}')">${doc.name}</h4>
+                        
+                        <div class="mt-3 flex items-center justify-between text-xs text-gray-500 border-t border-gray-300/50 pt-3">
+                            <span class="font-medium"><i class="fa-regular fa-calendar mr-1"></i> ${date}</span>
                             <div class="flex gap-2">
-                                <a href="${doc.fileUrl}" target="_blank" class="text-gray-400 hover:text-blue-500 transition" title="Download"><i class="fa-solid fa-download"></i></a>
-                                <button onclick="confirmDelete('${doc.id}', '${doc.storagePath}')" class="text-gray-400 hover:text-red-500 transition" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
+                                <a href="${doc.fileUrl}" target="_blank" class="w-7 h-7 bg-white rounded-full flex items-center justify-center text-gray-600 hover:text-vault-600 hover:bg-vault-50 shadow-sm transition" title="Download"><i class="fa-solid fa-download text-[11px]"></i></a>
+                                <button onclick="confirmDelete('${doc.id}', '${doc.storagePath}')" class="w-7 h-7 bg-white rounded-full flex items-center justify-center text-gray-600 hover:text-red-600 hover:bg-red-50 shadow-sm transition" title="Hapus"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                             </div>
                         </div>
                     </div>
@@ -727,56 +686,28 @@
         }
 
         function renderProfile() {
-            const content = document.getElementById('main-content');
-            content.innerHTML = `
-                <div class="max-w-3xl mx-auto fade-in">
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden relative">
-                        <div class="h-32 bg-gradient-to-r from-vault-300 to-vault-500"></div>
-                        <div class="px-6 sm:px-10 pb-10 relative">
-                            <div class="flex justify-between items-end -mt-16 mb-6">
-                                <div class="relative">
-                                    <img src="${currentUser.photoURL || 'https://placehold.co/150x150/ec4899/ffffff?text=U'}" class="w-32 h-32 rounded-full border-4 border-white shadow-md object-cover bg-white">
-                                </div>
-                                <span class="bg-vault-100 text-vault-700 px-4 py-1.5 rounded-full text-sm font-semibold border border-vault-200">
-                                    <i class="fa-solid fa-shield-check mr-1"></i> Akun Terverifikasi
-                                </span>
+            document.getElementById('main-content').innerHTML = `
+                <div class="max-w-2xl mx-auto fade-in mt-4">
+                    <div class="glass-card rounded-3xl overflow-hidden shadow-xl border border-white/60">
+                        <div class="h-32 bg-gradient-to-r from-vault-400 to-vault-600 relative">
+                            <div class="absolute inset-0 bg-white/10 pattern-dots"></div>
+                        </div>
+                        <div class="px-6 md:px-8 pb-8 relative">
+                            <div class="flex justify-between items-end -mt-14 mb-4">
+                                <img src="${currentUser.photoURL || 'https://placehold.co/150x150/ec4899/ffffff?text=U'}" class="w-28 h-28 rounded-full border-4 border-white shadow-lg object-cover bg-white">
+                                <span class="bg-green-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5"><i class="fa-solid fa-shield-check"></i> Aman</span>
                             </div>
-                            
                             <h2 class="text-2xl font-display font-bold text-gray-900">${currentUser.displayName || 'Pengguna'}</h2>
-                            <p class="text-gray-500 mb-6">${currentUser.email}</p>
+                            <p class="text-gray-600 font-medium">${currentUser.email}</p>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-100">
-                                <div>
-                                    <h4 class="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wider">Informasi Akun</h4>
-                                    <div class="space-y-4">
-                                        <div>
-                                            <p class="text-xs text-gray-500 mb-1">User ID</p>
-                                            <p class="text-sm font-mono bg-gray-50 p-2 rounded border border-gray-100 truncate">${currentUser.uid}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500 mb-1">Status Keanggotaan</p>
-                                            <p class="text-sm font-medium text-gray-800">Premium Personal Vault</p>
-                                        </div>
-                                    </div>
+                            <div class="mt-6 bg-white/50 rounded-2xl p-4 border border-white shadow-sm space-y-3">
+                                <div class="flex justify-between items-center pb-3 border-b border-gray-200/60">
+                                    <span class="text-sm font-bold text-gray-700">Total Folder</span>
+                                    <span class="text-sm font-bold text-vault-600">${allFolders.length} Folder</span>
                                 </div>
-                                <div>
-                                    <h4 class="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wider">Keamanan & Data</h4>
-                                    <div class="space-y-3">
-                                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-lock"></i></div>
-                                                <span class="text-sm font-medium text-gray-700">Enkripsi Data</span>
-                                            </div>
-                                            <span class="text-xs text-green-600 font-semibold bg-green-50 px-2 py-1 rounded">Aktif</span>
-                                        </div>
-                                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-brands fa-google"></i></div>
-                                                <span class="text-sm font-medium text-gray-700">Autentikasi Terhubung</span>
-                                            </div>
-                                            <span class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-1 rounded">Aman</span>
-                                        </div>
-                                    </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-bold text-gray-700">Total File Disimpan</span>
+                                    <span class="text-sm font-bold text-vault-600">${allDocuments.length} File</span>
                                 </div>
                             </div>
                         </div>
@@ -785,16 +716,15 @@
             `;
         }
 
-        // --- 7. UPLOAD & DOCUMENT MANAGEMENT LOGIC ---
+        // --- UPLOAD LOGIC ---
         let selectedFile = null;
-
         document.getElementById('file-input')?.addEventListener('change', (e) => {
             if(e.target.files.length > 0) {
                 selectedFile = e.target.files[0];
                 const preview = document.getElementById('file-preview-name');
                 preview.innerHTML = `<i class="fa-solid fa-file-check mr-2 text-vault-500"></i> ${selectedFile.name} <span class="text-gray-400 font-normal ml-1">(${(selectedFile.size/1024/1024).toFixed(2)} MB)</span>`;
                 preview.classList.remove('hidden');
-                document.getElementById('dropzone').classList.add('border-vault-400', 'bg-vault-50');
+                document.getElementById('dropzone').classList.add('border-vault-500', 'bg-vault-100/50');
             }
         });
 
@@ -803,81 +733,54 @@
             document.getElementById('upload-form').reset();
             selectedFile = null;
             document.getElementById('file-preview-name').classList.add('hidden');
-            document.getElementById('dropzone').classList.remove('border-vault-400', 'bg-vault-50');
+            document.getElementById('dropzone').classList.remove('border-vault-500', 'bg-vault-100/50');
         };
-
-        window.closeUploadModal = () => {
-            document.getElementById('upload-modal').classList.add('hidden');
-        };
+        window.closeUploadModal = () => document.getElementById('upload-modal').classList.add('hidden');
 
         window.submitUpload = async () => {
             if(!currentUser) return;
             const name = document.getElementById('doc-name').value;
-            const category = document.getElementById('doc-category').value;
+            const folderId = document.getElementById('doc-folder').value;
             
-            if(!selectedFile) return showToast("Pilih file dokumen terlebih dahulu", "error");
-            if(!name || !category) return showToast("Nama dan Kategori wajib diisi", "error");
-            if(selectedFile.size > 5 * 1024 * 1024) return showToast("Ukuran file maksimal 5MB", "error");
+            if(!selectedFile) return showToast("Pilih file data terlebih dahulu", "error");
+            if(!name || !folderId) return showToast("Nama dan Folder wajib diisi", "error");
 
             const btn = document.getElementById('btn-submit-upload');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Proses...';
             btn.disabled = true;
 
             try {
-                const fileExt = selectedFile.name.split('.').pop();
-                const fileName = `doc_${Date.now()}.${fileExt}`;
+                const fileName = `doc_${Date.now()}.${selectedFile.name.split('.').pop()}`;
                 const storagePath = `documents/${currentUser.uid}/${fileName}`;
                 const storageRef = ref(storage, storagePath);
                 
                 await uploadBytesResumable(storageRef, selectedFile);
                 const downloadURL = await getDownloadURL(storageRef);
 
-                const docData = {
-                    name: name,
-                    categoryId: category,
-                    docNumber: document.getElementById('doc-number').value || '',
-                    issueDate: document.getElementById('doc-date').value || null,
-                    notes: document.getElementById('doc-notes').value || '',
-                    fileUrl: downloadURL,
-                    storagePath: storagePath,
-                    fileType: selectedFile.type,
-                    fileName: selectedFile.name,
-                    fileSize: selectedFile.size,
-                    createdAt: serverTimestamp(),
-                    isFavorite: false
-                };
+                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'documents'), {
+                    name, folderId, notes: document.getElementById('doc-notes').value || '',
+                    fileUrl: downloadURL, storagePath, fileType: selectedFile.type,
+                    createdAt: serverTimestamp(), isFavorite: false
+                });
 
-                const docRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'documents');
-                await addDoc(docRef, docData);
-
-                showToast("Dokumen berhasil disimpan!");
+                showToast("Data berhasil diamankan!");
                 closeUploadModal();
-                if(currentView !== 'dashboard' && currentView !== 'all') navigate('all');
-
-            } catch (error) {
-                console.error(error);
-                showToast("Gagal mengunggah dokumen", "error");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+            } catch (e) { showToast("Gagal upload", "error"); } 
+            finally { btn.innerHTML = '<i class="fa-solid fa-upload"></i> Simpan Data'; btn.disabled = false; }
         };
 
+        // --- PREVIEW & ACTION LOGIC ---
         window.openPreview = (docId) => {
             const doc = allDocuments.find(d => d.id === docId);
             if(!doc) return;
-            
             const container = document.getElementById('preview-container');
-            const downloadBtn = document.getElementById('preview-download-btn');
-            downloadBtn.href = doc.fileUrl;
+            document.getElementById('preview-download-btn').href = doc.fileUrl;
             
             if (doc.fileType === 'application/pdf') {
-                container.innerHTML = `<iframe src="${doc.fileUrl}" class="w-full h-full border-none" title="PDF Preview"></iframe>`;
+                container.innerHTML = `<iframe src="${doc.fileUrl}" class="w-full h-full rounded-xl bg-white" title="PDF"></iframe>`;
             } else {
-                container.innerHTML = `<img src="${doc.fileUrl}" class="max-w-full max-h-full object-contain p-4" alt="Image Preview">`;
+                container.innerHTML = `<img src="${doc.fileUrl}" class="max-w-full max-h-full object-contain drop-shadow-2xl rounded-xl">`;
             }
-            
             document.getElementById('preview-modal').classList.remove('hidden');
         };
 
@@ -887,80 +790,35 @@
         };
 
         window.toggleFavorite = async (docId, status) => {
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'documents', docId);
-                await updateDoc(docRef, { isFavorite: status });
-                showToast(status ? "Ditambahkan ke favorit" : "Dihapus dari favorit", "success");
-            } catch (error) {
-                showToast("Gagal mengubah status", "error");
-            }
+            try { await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'documents', docId), { isFavorite: status }); } catch (e) {}
         };
 
-        // --- 8. DELETE LOGIC ---
         let docToDelete = null;
-        
-        window.confirmDelete = (docId, storagePath) => {
-            docToDelete = { id: docId, path: storagePath };
-            document.getElementById('delete-modal').classList.remove('hidden');
-        };
-
-        window.closeDeleteModal = () => {
-            docToDelete = null;
-            document.getElementById('delete-modal').classList.add('hidden');
-        };
+        window.confirmDelete = (docId, path) => { docToDelete = { id: docId, path }; document.getElementById('delete-modal').classList.remove('hidden'); };
+        window.closeDeleteModal = () => { docToDelete = null; document.getElementById('delete-modal').classList.add('hidden'); };
 
         document.getElementById('confirm-delete-btn')?.addEventListener('click', async () => {
             if(!docToDelete || !currentUser) return;
             const btn = document.getElementById('confirm-delete-btn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
 
             try {
-                const fileRef = ref(storage, docToDelete.path);
-                try {
-                    await deleteObject(fileRef);
-                } catch(e) {} // Abaikan jika file sudah tidak ada di storage
-
-                const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'documents', docToDelete.id);
-                await deleteDoc(docRef);
-
-                showToast("Dokumen dihapus");
-                closeDeleteModal();
-            } catch (error) {
-                showToast("Gagal menghapus", "error");
-            } finally {
-                btn.innerHTML = 'Ya, Hapus';
-                btn.disabled = false;
-                closeDeleteModal();
+                try { await deleteObject(ref(storage, docToDelete.path)); } catch(e) {}
+                await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'documents', docToDelete.id));
+                showToast("Data dihapus permanen");
+            } catch (e) {} finally {
+                btn.innerHTML = 'Ya, Hapus'; btn.disabled = false; closeDeleteModal();
             }
         });
 
-        // Search logic
+        // Search
         document.getElementById('global-search')?.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
-            if(query.length > 2) {
-                const filtered = allDocuments.filter(d => d.name.toLowerCase().includes(query) || d.notes.toLowerCase().includes(query));
-                renderDocumentList(filtered);
-                document.getElementById('header-title').textContent = `Pencarian: "${query}"`;
-            } else if(query.length === 0) {
-                navigate(currentView, currentView === 'category' ? document.querySelector('.nav-item.bg-vault-100')?.dataset.view.replace('cat-','') : null);
-            }
+            if(query.length > 1) {
+                renderDocumentList(allDocuments.filter(d => d.name.toLowerCase().includes(query)));
+                document.getElementById('header-title').textContent = `Cari: "${query}"`;
+            } else if(query.length === 0) navigate(currentView, currentView === 'folder' ? document.querySelector('.nav-item.bg-white\\/80')?.dataset.view.replace('folder-','') : null);
         });
-
-        // Drag and drop support
-        const dropzone = document.getElementById('dropzone');
-        if(dropzone) {
-            dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-vault-400', 'bg-vault-100'); });
-            dropzone.addEventListener('dragleave', (e) => { e.preventDefault(); dropzone.classList.remove('border-vault-400', 'bg-vault-100'); });
-            dropzone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropzone.classList.remove('border-vault-400', 'bg-vault-100');
-                if(e.dataTransfer.files.length) {
-                    document.getElementById('file-input').files = e.dataTransfer.files;
-                    document.getElementById('file-input').dispatchEvent(new Event('change'));
-                }
-            });
-        }
     </script>
 </body>
 </html>
