@@ -2,186 +2,323 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Documents - Vault</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Documents - Digital Vault</title>
+    
+    <!-- Google Fonts: Poppins & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
                     colors: {
+                        // Tema Dark Mode (Indigo & Slate) mirip gambar referensi
                         brand: {
-                            400: '#818cf8', // Indigo 400
-                            500: '#6366f1', // Indigo 500
-                            600: '#4f46e5', // Indigo 600
-                            900: '#312e81', // Indigo 900
-                        },
-                        dark: {
-                            800: '#1e293b', // Slate 800
-                            900: '#0f172a', // Slate 900
-                            950: '#020617', // Slate 950
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1', // Indigo utama
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
                         }
                     }
                 }
             }
         }
     </script>
+
     <style>
-        /* Custom Scrollbar untuk Tema Gelap */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        /* Custom Scrollbar & Animations */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.4); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
         
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Glassmorphism Panel - Tema Gelap Profesional */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.75); /* Slate 900 */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.65); /* Slate 800 */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-slate-200 font-sans min-h-screen relative antialiased selection:bg-brand-500 selection:text-white">
+<body class="text-slate-300 font-sans antialiased overflow-hidden bg-slate-950">
 
-    <!-- Latar Belakang Custom (Foto Anda) -->
-    <!-- Tingkat blur diturunkan (backdrop-blur-sm) dan dilapisi warna hitam transparan (bg-slate-950/80) -->
-    <div class="fixed inset-0 z-[-2] bg-cover bg-center" style="background-image: url('background.jpg');"></div>
-    <div class="fixed inset-0 z-[-1] bg-slate-950/80 backdrop-blur-sm"></div>
+    <!-- FOTO BACKGROUND (Blur Dikurangi agar lebih terlihat) -->
+    <div class="fixed inset-0 z-[-2] w-full h-full pointer-events-none bg-slate-950" style="background-image: url('background.jpg'); background-size: cover; background-position: center; background-attachment: fixed;"></div>
+    
+    <!-- Efek Transparan Gelap (Hanya 6px blur, dengan gradien gelap/biru) -->
+    <div class="fixed inset-0 z-[-1] w-full h-full bg-slate-950/85 backdrop-blur-[4px] pointer-events-none"></div>
 
-    <!-- Input Tersembunyi Untuk Ganti Foto Profil -->
-    <input type="file" id="profileUploadInput" accept="image/*" class="hidden">
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-[90%] md:max-w-sm px-4 md:px-0"></div>
 
-    <!-- ==================== HALAMAN LOGIN ==================== -->
-    <div id="loginPage" class="min-h-screen flex items-center justify-center p-4 transition-opacity duration-500">
-        <div class="glass-panel rounded-3xl p-8 w-full max-w-md shadow-2xl shadow-brand-500/10 text-center border-t border-white/10">
-            <div class="w-20 h-20 bg-gradient-to-br from-brand-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-brand-500/30 mb-6">
-                <i class="fa-solid fa-book-open text-3xl text-white"></i>
+    <!-- Global Hidden Inputs -->
+    <input type="file" id="profile-upload-input" class="hidden" accept=".jpg, .jpeg, .png, .webp" onchange="handleProfileUpload(event)">
+
+    <!-- ================= AUTHENTICATION VIEW ================= -->
+    <div id="auth-view" class="h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
+        <div class="glass-panel p-8 md:p-10 rounded-3xl w-full max-w-md text-center transform transition-all z-10">
+            <div class="mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-500/30 transform rotate-3">
+                    <i class="fa-solid fa-code text-3xl transform -rotate-3"></i>
+                </div>
+                <h1 class="text-3xl font-display font-bold text-white drop-shadow-sm">Digital Vault</h1>
+                <p class="text-sm text-slate-400 mt-2 font-medium">Secure Private Storage</p>
             </div>
-            <h1 class="text-3xl font-bold text-white mb-2">My Vault</h1>
-            <p class="text-slate-400 mb-8 text-sm">Brankas Dokumen Digital Premium</p>
 
-            <form id="loginForm" class="space-y-4 text-left">
+            <!-- Unified Login Form -->
+            <div class="space-y-5 text-left">
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1">Email</label>
-                    <input type="email" id="emailInput" class="w-full px-4 py-3 bg-dark-800/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-white placeholder-slate-500" placeholder="nama@email.com">
+                    <label class="block text-sm font-semibold text-slate-300 mb-1.5 ml-1">Email</label>
+                    <input type="email" id="login-email" class="w-full rounded-xl border border-slate-700 bg-slate-800/60 text-white p-3.5 focus:ring-2 focus:ring-brand-500 outline-none transition-all placeholder-slate-500" placeholder="nama@email.com">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1">Password</label>
-                    <input type="password" id="passwordInput" class="w-full px-4 py-3 bg-dark-800/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-white placeholder-slate-500" placeholder="••••••••">
+                    <label class="block text-sm font-semibold text-slate-300 mb-1.5 ml-1">Password</label>
+                    <input type="password" id="login-password" class="w-full rounded-xl border border-slate-700 bg-slate-800/60 text-white p-3.5 focus:ring-2 focus:ring-brand-500 outline-none transition-all placeholder-slate-500" placeholder="••••••••">
                 </div>
-                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 rounded-xl transition-all shadow-lg shadow-brand-500/20 active:scale-[0.98]">
-                    Masuk ke Brankas
+                <button id="btn-email-login" class="w-full bg-brand-600 text-white rounded-xl py-3.5 font-bold hover:bg-brand-500 transition shadow-lg shadow-brand-500/20 mt-2">
+                    Masuk
                 </button>
-            </form>
 
-            <div class="relative my-8">
-                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-700"></div></div>
-                <div class="relative flex justify-center text-xs"><span class="bg-dark-900 px-4 text-slate-400 rounded-full border border-slate-700">ATAU</span></div>
+                <div class="flex items-center py-2 opacity-60">
+                    <div class="flex-grow border-t border-slate-600"></div>
+                    <span class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">atau</span>
+                    <div class="flex-grow border-t border-slate-600"></div>
+                </div>
+
+                <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-slate-800 border border-slate-700 rounded-xl py-3.5 px-4 text-white font-bold hover:bg-slate-700 transition shadow-md">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                    Lanjutkan dengan Google
+                </button>
             </div>
-
-            <button id="btnGoogleLogin" class="w-full bg-dark-800 hover:bg-slate-700 text-white border border-slate-600 font-medium py-3 rounded-xl transition-all flex items-center justify-center gap-3">
-                <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                Lanjutkan dengan Google
-            </button>
+            
+            <div id="auth-loading" class="hidden mt-6 text-brand-400">
+                <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
+            </div>
         </div>
     </div>
 
-    <!-- ==================== DASHBOARD ==================== -->
-    <div id="dashboardPage" class="hidden min-h-screen flex flex-col md:flex-row">
+    <!-- ================= MAIN APP VIEW ================= -->
+    <div id="app-view" class="hidden h-screen w-full flex bg-transparent">
         
-        <!-- Sidebar -->
-        <aside class="w-full md:w-72 glass-panel border-r border-white/5 flex flex-col h-auto md:h-screen sticky top-0 z-20">
-            <div class="p-6 flex items-center gap-4 border-b border-white/5">
-                <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
-                    <i class="fa-solid fa-book-open text-white"></i>
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="glass-panel w-64 md:w-72 h-full flex flex-col transition-transform transform -translate-x-full md:translate-x-0 fixed md:relative z-30 border-r border-white/5 border-t-0 border-l-0 border-b-0">
+            <div class="p-6 flex items-center gap-3 border-b border-slate-700/50">
+                <div class="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-xl flex items-center justify-center shadow-md shadow-brand-500/20">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
                 </div>
-                <h2 class="text-xl font-bold text-white tracking-wide">My Vault</h2>
-            </div>
-            
-            <div class="p-6 flex items-center gap-4 border-b border-white/5">
-                <div class="relative group cursor-pointer" onclick="document.getElementById('profileUploadInput').click()" title="Klik untuk ganti foto profil">
-                    <img id="sidebarProfilePic" src="https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff" class="w-12 h-12 rounded-full border-2 border-slate-600 object-cover group-hover:border-brand-400 transition-colors">
-                    <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <i class="fa-solid fa-camera text-xs text-white"></i>
-                    </div>
-                </div>
-                <div class="overflow-hidden">
-                    <p id="sidebarName" class="font-semibold text-white truncate">Memuat...</p>
-                    <p class="text-xs text-brand-400">Personal Account</p>
+                <div>
+                    <h2 class="font-display font-bold text-xl leading-tight text-white">My Docs</h2>
+                    <p class="text-xs text-brand-400 font-medium">Digital Vault</p>
                 </div>
             </div>
 
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-                <button class="w-full flex items-center gap-3 px-4 py-3 bg-brand-600/20 text-brand-400 rounded-xl font-medium border border-brand-500/30">
-                    <i class="fa-solid fa-house w-5"></i> Semua Folder
-                </button>
-            </nav>
+            <div class="flex-1 overflow-y-auto hide-scroll py-4 px-4 space-y-1.5" id="nav-menu">
+                <!-- Navigation inserted via JS -->
+            </div>
 
-            <div class="p-4 border-t border-white/5">
-                <button id="btnLogout" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition font-medium">
-                    <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Keluar
+            <div class="p-4 border-t border-slate-700/50">
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800/50 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-xl transition font-bold border border-transparent hover:border-red-500/30">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
                 </button>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-8 h-screen overflow-y-auto pb-24 md:pb-8">
-            <header class="flex justify-between items-center mb-8 glass-panel p-4 md:p-6 rounded-2xl">
-                <div>
-                    <h2 class="text-2xl font-bold text-white" id="welcomeText">Halo!</h2>
-                    <p class="text-slate-400 text-sm mt-1">Kelola dokumen penting Anda dengan aman.</p>
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+            
+            <!-- Top Header -->
+            <header class="h-20 glass-panel border-b border-white/5 flex items-center justify-between px-4 md:px-8 z-10 sticky top-0 md:rounded-none rounded-b-xl mx-2 md:mx-0 mt-2 md:mt-0 border-t-0 border-l-0 border-r-0">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="md:hidden w-10 h-10 bg-slate-800/60 border border-slate-700 rounded-xl flex items-center justify-center text-white shadow-sm focus:outline-none">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 id="header-title" class="font-display font-bold text-lg md:text-xl text-white drop-shadow-sm truncate max-w-[150px] md:max-w-md hidden md:block">Dashboard</h2>
                 </div>
-                <!-- Profile Mobile / Desktop Header -->
-                <div class="relative group cursor-pointer" onclick="document.getElementById('profileUploadInput').click()" title="Klik untuk ganti foto profil">
-                    <img id="headerProfilePic" src="https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff" class="w-12 h-12 rounded-full border-2 border-slate-600 object-cover shadow-lg group-hover:border-brand-400 transition-colors">
-                    <div class="absolute -bottom-1 -right-1 bg-brand-600 w-5 h-5 rounded-full flex items-center justify-center border-2 border-dark-900 shadow-sm">
-                        <i class="fa-solid fa-pen text-[9px] text-white"></i>
+                
+                <div class="flex items-center gap-3 md:gap-5">
+                    <div class="relative hidden md:block">
+                        <i class="fa-solid fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="global-search" placeholder="Cari data..." class="pl-10 pr-4 py-2.5 bg-slate-900/60 border border-slate-700 rounded-full text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-brand-500 w-56 transition-all shadow-inner placeholder-slate-500">
                     </div>
+                    
+                    <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition md:border-r md:border-slate-700 md:pr-5" onclick="navigate('profile')">
+                        <div class="text-right hidden sm:block">
+                            <p id="user-name-display" class="text-sm font-bold text-white drop-shadow-sm">User Name</p>
+                            <p class="text-[10px] text-brand-400 font-bold tracking-wider uppercase">Premium</p>
+                        </div>
+                        <img id="user-avatar-display" src="https://placehold.co/100x100/4f46e5/ffffff?text=U" alt="Profile" class="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-2 border-brand-500 shadow-md">
+                    </div>
+
+                    <!-- Tombol Keluar Kanan Atas -->
+                    <button onclick="handleLogout()" class="hidden md:flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800/80 hover:bg-red-500/20 text-slate-300 hover:text-red-400 rounded-xl transition font-bold border border-slate-700 hover:border-red-500/30 text-sm">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+                    </button>
                 </div>
             </header>
 
-            <!-- Folder Management -->
-            <div class="mb-8">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <h3 class="text-xl font-semibold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-folder-open text-brand-400"></i> Brankas Folder
-                    </h3>
-                    <button onclick="createNewFolder()" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Buat Folder Baru
-                    </button>
-                </div>
-                
-                <div id="folderGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    <!-- Folder List goes here -->
-                </div>
+            <!-- Scrollable Content View -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 relative" id="main-content">
+                <!-- Dynamic Content Loaded Here -->
             </div>
             
-            <!-- Document List -->
-            <div>
-                <h3 class="text-xl font-semibold text-white mb-4 flex items-center gap-2" id="currentFolderName">
-                    <i class="fa-solid fa-file-lines text-brand-400"></i> Pilih folder untuk melihat file
-                </h3>
-                <div id="documentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Dokumen list -->
-                </div>
-            </div>
+            <!-- Floating Action Button (Upload) -->
+            <button id="fab-upload" onclick="openUploadModal()" class="fixed bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 bg-brand-600 text-white rounded-full shadow-lg shadow-brand-500/40 flex items-center justify-center text-2xl hover:bg-brand-500 hover:scale-105 transition transform z-10 group border border-brand-400/50">
+                <i class="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
+            </button>
         </main>
     </div>
 
-    <!-- Firebase SDK (Modular) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, deleteDoc, doc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject, uploadBytes } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    <!-- ================= MODALS ================= -->
+    
+    <!-- Modal Tambah Folder -->
+    <div id="folder-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl shadow-2xl p-6 w-full max-w-sm text-center fade-in border border-slate-700">
+            <div class="w-16 h-16 bg-slate-800 text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-700 shadow-inner">
+                <i class="fa-solid fa-folder-plus text-2xl"></i>
+            </div>
+            <h3 class="font-display font-bold text-xl text-white mb-2">Buat Folder Baru</h3>
+            <p class="text-sm text-slate-400 mb-5 font-medium">Kelompokkan dokumen Anda agar lebih rapi.</p>
+            
+            <input type="text" id="new-folder-name" class="w-full bg-slate-900/80 border border-slate-700 text-white rounded-xl p-3.5 mb-5 focus:ring-2 focus:ring-brand-500 outline-none text-sm font-medium placeholder-slate-500" placeholder="Nama folder (Cth: Proyek, Pribadi)">
+            
+            <div class="flex gap-3">
+                <button onclick="closeFolderModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 transition border border-slate-600">Batal</button>
+                <button onclick="submitFolder()" id="btn-submit-folder" class="flex-1 py-3 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-500 shadow-md shadow-brand-500/20 transition">Buat</button>
+            </div>
+        </div>
+    </div>
 
-        // KONFIGURASI FIREBASE ANDA
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+        <div class="glass-panel rounded-t-3xl md:rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden fade-in border border-slate-700">
+            <div class="px-6 py-4 border-b border-slate-700/50 flex justify-between items-center bg-slate-900/50">
+                <h3 class="font-display font-bold text-lg text-white">Upload Dokumen Baru</h3>
+                <button onclick="closeUploadModal()" class="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:bg-red-500/20 hover:text-red-400 transition"><i class="fa-solid fa-times"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-1 hide-scroll">
+                <form id="upload-form" class="space-y-5">
+                    <!-- File Dropzone -->
+                    <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-2xl p-6 md:p-8 text-center bg-slate-800/30 hover:bg-slate-800/60 hover:border-brand-500 transition cursor-pointer" onclick="document.getElementById('file-input').click()">
+                        <input type="file" id="file-input" class="hidden" accept=".pdf, .jpg, .jpeg, .png, .webp">
+                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-brand-400 mb-3 drop-shadow-sm"></i>
+                        <p class="text-sm text-slate-300 font-bold">Tap atau pilih file di sini</p>
+                        <p class="text-xs text-slate-500 mt-1 font-medium">Mendukung PDF & Gambar (Max 5MB)</p>
+                        <div id="file-preview-name" class="mt-4 text-sm font-bold text-brand-300 hidden bg-slate-900 py-2 px-4 rounded-xl shadow-sm border border-slate-700 inline-block"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="text-sm font-bold text-slate-300">Nama Dokumen <span class="text-brand-500">*</span></label>
+                            <input type="text" id="doc-name" required class="w-full bg-slate-900/80 border border-slate-700 text-white rounded-xl p-3 focus:ring-2 focus:ring-brand-500 outline-none text-sm transition placeholder-slate-500" placeholder="Cth: Laporan Keuangan">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-sm font-bold text-slate-300">Pilih Folder <span class="text-brand-500">*</span></label>
+                            <div class="flex gap-2">
+                                <select id="doc-folder" required class="flex-1 bg-slate-900/80 border border-slate-700 text-white rounded-xl p-3 focus:ring-2 focus:ring-brand-500 outline-none text-sm transition font-medium">
+                                    <!-- Populated via JS -->
+                                </select>
+                                <button type="button" onclick="openFolderModal()" class="w-12 h-12 bg-slate-800 text-brand-400 rounded-xl flex items-center justify-center hover:bg-slate-700 transition border border-slate-600" title="Buat Folder Baru">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-sm font-bold text-slate-300">Keterangan Tambahan (Opsional)</label>
+                        <textarea id="doc-notes" rows="2" class="w-full bg-slate-900/80 border border-slate-700 text-white rounded-xl p-3 focus:ring-2 focus:ring-brand-500 outline-none text-sm resize-none transition placeholder-slate-500" placeholder="Catatan singkat..."></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-slate-700/50 flex justify-end gap-3 bg-slate-900/80">
+                <button onclick="closeUploadModal()" class="px-5 py-3 rounded-xl bg-slate-800 border border-slate-600 text-slate-300 font-bold hover:bg-slate-700 transition text-sm">Batal</button>
+                <button onclick="submitUpload()" id="btn-submit-upload" class="px-5 py-3 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-500 shadow-md shadow-brand-500/20 transition text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-upload"></i> Simpan Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Preview Modal -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 md:p-8">
+        <div class="bg-slate-900/50 rounded-2xl w-full max-w-5xl h-[95vh] md:h-[90vh] flex flex-col overflow-hidden fade-in relative border border-slate-700">
+            <div class="absolute top-4 right-4 z-10 flex gap-3">
+                <a id="preview-download-btn" href="#" target="_blank" class="w-10 h-10 md:w-12 md:h-12 bg-slate-800/80 backdrop-blur border border-slate-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-brand-600 transition text-lg">
+                    <i class="fa-solid fa-download"></i>
+                </a>
+                <button onclick="closePreviewModal()" class="w-10 h-10 md:w-12 md:h-12 bg-red-500/80 backdrop-blur border border-red-400/50 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition text-lg">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div id="preview-container" class="flex-1 flex items-center justify-center overflow-hidden p-2">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl shadow-2xl p-6 w-full max-w-sm text-center fade-in border border-slate-700">
+            <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-500/20 shadow-inner">
+                <i class="fa-solid fa-trash-can text-2xl"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg text-white mb-2">Hapus Data?</h3>
+            <p class="text-sm text-slate-400 font-medium mb-6">Tindakan ini tidak dapat dibatalkan. File akan dihapus permanen.</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-slate-800 border border-slate-600 text-slate-300 font-bold hover:bg-slate-700 transition">Batal</button>
+                <button id="confirm-delete-btn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-500 shadow-md shadow-red-500/20 transition">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= FIREBASE & APP LOGIC ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Tambahan fitur updateProfile untuk mengganti foto profil
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // Konfigurasi Firebase Milik Anda
         const firebaseConfig = {
             apiKey: "AIzaSyCBPtcWIM1s_Vf-4OGCt-LTYeSiosNVRhs",
             authDomain: "data-pribadi-1b175.firebaseapp.com",
@@ -191,283 +328,670 @@
             appId: "1:236777372220:web:da9cbc51e966d63147e139",
             measurementId: "G-NC79XS3YDH"
         };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
         
-        let activeFolderId = null;
+        const appId = 'my-documents-vault';
 
-        // UI Elements
-        const loginPage = document.getElementById('loginPage');
-        const dashboardPage = document.getElementById('dashboardPage');
-        const btnGoogleLogin = document.getElementById('btnGoogleLogin');
-        const loginForm = document.getElementById('loginForm');
-        const btnLogout = document.getElementById('btnLogout');
-        const profileUploadInput = document.getElementById('profileUploadInput');
+        let app, auth, db, storage;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
+        } catch(e) {
+            console.error("Firebase init error.", e);
+        }
 
-        // Auth State Listener
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loginPage.classList.add('hidden');
-                dashboardPage.classList.remove('hidden');
-                
-                // Set User Info
-                document.getElementById('welcomeText').textContent = `Halo, ${user.displayName || 'Pengguna'}!`;
-                document.getElementById('sidebarName').textContent = user.displayName || 'Pengguna';
-                
-                const photoUrl = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=4f46e5&color=fff`;
-                document.getElementById('headerProfilePic').src = photoUrl;
-                document.getElementById('sidebarProfilePic').src = photoUrl;
-                
-                loadFolders();
-            } else {
-                loginPage.classList.remove('hidden');
-                dashboardPage.classList.add('hidden');
-            }
-        });
+        // --- GLOBAL STATE ---
+        let currentUser = null;
+        let currentView = 'dashboard';
+        let unsubscribeDocs = null;
+        let unsubscribeFolders = null;
+        let allDocuments = [];
+        let allFolders = [];
 
-        // Google Login
-        btnGoogleLogin.addEventListener('click', () => {
-            const provider = new GoogleAuthProvider();
-            signInWithPopup(auth, provider).catch(error => {
-                alert("Gagal login Google: " + error.message);
-            });
-        });
+        // --- UI UTILITIES ---
+        window.showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bg = type === 'error' ? 'bg-red-500' : 'bg-brand-600';
+            const icon = type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check';
 
-        // Email Login
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-            signInWithEmailAndPassword(auth, email, password).catch(error => {
-                alert("Login gagal. Periksa email & password Anda.");
-            });
-        });
-
-        // Logout
-        btnLogout.addEventListener('click', () => {
-            signOut(auth);
-        });
-
-        // ================= GANTI FOTO PROFIL =================
-        profileUploadInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (!auth.currentUser) return;
-
-            const headerPic = document.getElementById('headerProfilePic');
-            const sidebarPic = document.getElementById('sidebarProfilePic');
+            toast.className = `${bg} text-white p-4 rounded-xl shadow-lg border border-white/10 flex items-center gap-3 fade-in pointer-events-auto font-medium text-sm`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i> <span>${message}</span>`;
             
-            // Efek loading
-            headerPic.style.opacity = '0.5';
-            sidebarPic.style.opacity = '0.5';
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
 
-            try {
-                // Upload ke Storage
-                const storageRef = ref(storage, `profiles/${auth.currentUser.uid}/profile_${Date.now()}`);
-                await uploadBytes(storageRef, file);
-                const photoURL = await getDownloadURL(storageRef);
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        };
 
-                // Update Profile Google/Firebase Auth
-                await updateProfile(auth.currentUser, {
-                    photoURL: photoURL
-                });
+        // --- AUTH LOGIC ---
+        const handleAuthChange = async (user) => {
+            if (user) {
+                currentUser = user;
+                const name = user.displayName || user.email.split('@')[0];
+                document.getElementById('user-name-display').textContent = name;
+                document.getElementById('user-avatar-display').src = user.photoURL || `https://placehold.co/100x100/4f46e5/ffffff?text=${name.charAt(0).toUpperCase()}`;
 
-                // Update UI
-                headerPic.src = photoURL;
-                sidebarPic.src = photoURL;
+                document.getElementById('auth-view').classList.add('hidden');
+                document.getElementById('app-view').classList.remove('hidden');
                 
-                alert('Foto profil berhasil diperbarui!');
-            } catch (error) {
-                console.error(error);
-                alert('Gagal mengupload foto profil.');
-            } finally {
-                headerPic.style.opacity = '1';
-                sidebarPic.style.opacity = '1';
-                profileUploadInput.value = ''; // Reset input
+                listenToFolders();
+                listenToDocuments();
+            } else {
+                currentUser = null;
+                if(unsubscribeDocs) unsubscribeDocs();
+                if(unsubscribeFolders) unsubscribeFolders();
+                allDocuments = [];
+                allFolders = [];
+                
+                document.getElementById('auth-view').classList.remove('hidden');
+                document.getElementById('app-view').classList.add('hidden');
             }
+            document.getElementById('auth-loading').classList.add('hidden');
+        };
+
+        onAuthStateChanged(auth, handleAuthChange);
+
+        document.getElementById('btn-email-login')?.addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            if(!email || !password) return showToast("Email dan Password wajib diisi", "error");
+            document.getElementById('auth-loading').classList.remove('hidden');
+            try { await signInWithEmailAndPassword(auth, email, password); } 
+            catch (e) { showToast("Gagal login.", "error"); document.getElementById('auth-loading').classList.add('hidden'); }
         });
 
-        // ================= FOLDER MANAGEMENT =================
-        window.createNewFolder = async () => {
-            const folderName = prompt("Masukkan nama folder baru (misal: Pekerjaan, Berkas Istri):");
-            if (!folderName || folderName.trim() === "") return;
+        document.getElementById('btn-google-login')?.addEventListener('click', async () => {
+            document.getElementById('auth-loading').classList.remove('hidden');
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
+            catch (e) { showToast("Gagal login Google", "error"); document.getElementById('auth-loading').classList.add('hidden'); }
+        });
+
+        window.handleLogout = async () => {
+            try { await signOut(auth); } catch (e) {}
+        };
+
+        // --- FOTO PROFIL UPLOAD LOGIC ---
+        window.handleProfileUpload = async (event) => {
+            const file = event.target.files[0];
+            if(!file || !currentUser) return;
+            
+            const btn = document.getElementById('profile-upload-btn');
+            if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i>';
+            
+            try {
+                // Upload foto ke Storage
+                const storagePath = `profiles/${currentUser.uid}_${Date.now()}`;
+                const storageRef = ref(storage, storagePath);
+                await uploadBytesResumable(storageRef, file);
+                const downloadURL = await getDownloadURL(storageRef);
+                
+                // Update profil pengguna di Authentication
+                await updateProfile(currentUser, { photoURL: downloadURL });
+                
+                // Update tampilan gambar di semua tempat
+                const previewImg = document.getElementById('profile-img-preview');
+                const heroImg = document.getElementById('hero-profile-img');
+                const avatarDisplay = document.getElementById('user-avatar-display');
+                
+                if(previewImg) previewImg.src = downloadURL;
+                if(heroImg) heroImg.src = downloadURL;
+                if(avatarDisplay) avatarDisplay.src = downloadURL;
+                
+                showToast("Foto profil berhasil diperbarui!");
+            } catch (error) {
+                showToast("Gagal mengunggah foto", "error");
+                console.error(error);
+            } finally {
+                if(btn) btn.innerHTML = '<i class="fa-solid fa-camera text-xs"></i>';
+            }
+        };
+
+        // --- DYNAMIC FOLDERS LOGIC ---
+        function listenToFolders() {
+            if(!currentUser) return;
+            const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'folders'), orderBy('createdAt', 'desc'));
+            unsubscribeFolders = onSnapshot(q, (snapshot) => {
+                allFolders = [];
+                snapshot.forEach(doc => allFolders.push({ id: doc.id, ...doc.data() }));
+                buildNavigation();
+                updateUploadFolderDropdown();
+                if(currentView === 'dashboard') renderDashboard();
+            });
+        }
+
+        function updateUploadFolderDropdown() {
+            const select = document.getElementById('doc-folder');
+            select.innerHTML = '';
+            if(allFolders.length === 0) {
+                select.innerHTML = '<option value="none">Tanpa Folder (Umum)</option>';
+            } else {
+                allFolders.forEach(f => {
+                    select.innerHTML += `<option value="${f.id}">${f.name}</option>`;
+                });
+            }
+        }
+
+        window.openFolderModal = () => {
+            document.getElementById('folder-modal').classList.remove('hidden');
+            document.getElementById('new-folder-name').value = '';
+            document.getElementById('new-folder-name').focus();
+        };
+        window.closeFolderModal = () => document.getElementById('folder-modal').classList.add('hidden');
+
+        window.submitFolder = async () => {
+            const name = document.getElementById('new-folder-name').value.trim();
+            if(!name) return showToast("Nama folder harus diisi", "error");
+            
+            const btn = document.getElementById('btn-submit-folder');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
 
             try {
-                await addDoc(collection(db, `users/${auth.currentUser.uid}/folders`), {
-                    name: folderName,
+                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'folders'), {
+                    name: name,
                     createdAt: serverTimestamp()
                 });
-                loadFolders();
-            } catch (error) {
-                alert("Gagal membuat folder: " + error.message);
+                showToast("Folder berhasil dibuat!");
+                closeFolderModal();
+            } catch(e) {
+                showToast("Gagal membuat folder", "error");
+            } finally {
+                btn.innerHTML = 'Buat';
+                btn.disabled = false;
             }
         };
 
-        async function loadFolders() {
-            const folderGrid = document.getElementById('folderGrid');
-            folderGrid.innerHTML = `<div class="text-slate-400 text-sm">Memuat folder...</div>`;
+        // --- NAVIGATION LOGIC ---
+        function buildNavigation() {
+            const nav = document.getElementById('nav-menu');
+            let html = `
+                <a href="#dashboard" onclick="navigate('dashboard')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-300 font-medium hover:bg-slate-800 hover:text-white" data-view="dashboard">
+                    <i class="fa-solid fa-house w-6 text-center text-brand-500"></i> <span>Dashboard Utama</span>
+                </a>
+                <a href="#all" onclick="navigate('all')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-300 font-medium hover:bg-slate-800 hover:text-white" data-view="all">
+                    <i class="fa-solid fa-database w-6 text-center text-brand-500"></i> <span>Semua Data</span>
+                </a>
+                
+                <div class="mt-6 mb-2 px-4 flex justify-between items-center">
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Folder Saya</span>
+                    <button onclick="openFolderModal()" class="text-brand-400 hover:text-brand-300 transition p-1"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            `;
             
-            try {
-                const q = query(collection(db, `users/${auth.currentUser.uid}/folders`), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                
-                folderGrid.innerHTML = "";
-                
-                if(querySnapshot.empty) {
-                    folderGrid.innerHTML = `<div class="col-span-full text-slate-400 p-4 border border-slate-700 border-dashed rounded-xl text-center bg-dark-800/30">Belum ada folder. Buat folder pertama Anda!</div>`;
-                    return;
-                }
+            if(allFolders.length === 0) {
+                html += `<div class="px-4 py-2 text-xs text-slate-500 font-medium italic">Belum ada folder.</div>`;
+            } else {
+                allFolders.forEach(f => {
+                    html += `
+                        <a href="#folder-${f.id}" onclick="navigate('folder', '${f.id}')" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-slate-400 font-medium hover:bg-slate-800 hover:text-white group" data-view="folder-${f.id}">
+                            <i class="fa-solid fa-folder text-slate-500 group-hover:text-brand-400 transition"></i>
+                            <span class="truncate">${f.name}</span>
+                        </a>
+                    `;
+                });
+            }
 
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const folderDiv = document.createElement('div');
-                    folderDiv.className = "glass-panel p-5 rounded-xl cursor-pointer hover:border-brand-500/50 hover:shadow-lg hover:shadow-brand-500/10 transition group";
-                    folderDiv.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="text-brand-400 text-2xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-folder"></i></div>
-                                <h4 class="font-medium text-white">${data.name}</h4>
-                            </div>
-                            <button onclick="event.stopPropagation(); deleteFolder('${docSnap.id}')" class="text-slate-500 hover:text-red-400 transition">
-                                <i class="fa-solid fa-trash-can"></i>
+            html += `
+                <div class="mt-6 mb-2 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Lainnya</div>
+                <a href="#favorites" onclick="navigate('favorites')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-300 font-medium hover:bg-slate-800 hover:text-white" data-view="favorites">
+                    <i class="fa-solid fa-star w-6 text-center text-yellow-500"></i> <span>Favorit</span>
+                </a>
+            `;
+            nav.innerHTML = html;
+            highlightNav(currentView);
+        }
+
+        function highlightNav(view, param=null) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-slate-800/80', 'text-white', 'border', 'border-white/5'));
+            let activeTarget = view === 'folder' ? `folder-${param}` : view;
+            const activeEl = document.querySelector(`.nav-item[data-view="${activeTarget}"]`);
+            if(activeEl) activeEl.classList.add('bg-slate-800/80', 'text-white', 'border', 'border-white/5');
+        }
+
+        window.navigate = (view, param = null) => {
+            currentView = view;
+            highlightNav(view, param);
+            
+            const title = document.getElementById('header-title');
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-overlay').classList.add('hidden');
+            }
+
+            if(view === 'dashboard') { title.textContent = 'Dashboard Utama'; renderDashboard(); }
+            else if(view === 'all') { title.textContent = 'Semua Data'; renderDocumentList(allDocuments); }
+            else if(view === 'folder') { 
+                const folder = allFolders.find(f => f.id === param);
+                title.textContent = folder ? folder.name : 'Folder';
+                renderDocumentList(allDocuments.filter(d => d.folderId === param), folder); 
+            }
+            else if(view === 'favorites') { title.textContent = 'Data Favorit'; renderDocumentList(allDocuments.filter(d => d.isFavorite)); }
+            else if(view === 'profile') { title.textContent = 'Profil Pengguna'; renderProfile(); }
+        };
+
+        // --- DOCUMENTS FETCH & RENDER ---
+        function listenToDocuments() {
+            if(!currentUser) return;
+            const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'documents'), orderBy('createdAt', 'desc'));
+            unsubscribeDocs = onSnapshot(q, (snapshot) => {
+                allDocuments = [];
+                snapshot.forEach(doc => allDocuments.push({ id: doc.id, ...doc.data() }));
+                navigate(currentView, currentView === 'folder' ? document.querySelector('.nav-item.bg-slate-800\\/80')?.dataset.view.replace('folder-','') : null);
+            });
+        }
+
+        function renderDashboard() {
+            const content = document.getElementById('main-content');
+            const avatarUrl = currentUser.photoURL || `https://placehold.co/400x400/4f46e5/ffffff?text=${(currentUser.displayName || 'U').charAt(0).toUpperCase()}`;
+            const userName = currentUser.displayName || 'Pengguna';
+            
+            let html = `
+                <!-- HERO SECTION (Sesuai Referensi CodeCraft) -->
+                <div class="flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12 mb-16 mt-4 md:mt-8 fade-in">
+                    
+                    <!-- Left Side: Texts & Buttons -->
+                    <div class="flex-1 space-y-6 text-center md:text-left z-10">
+                        <span class="inline-block bg-brand-900/60 text-brand-300 border border-brand-500/30 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase shadow-sm">
+                            <i class="fa-solid fa-shield-halved mr-1.5"></i> Premium Document Vault
+                        </span>
+                        
+                        <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-tight drop-shadow-lg">
+                            Hi, I'm <span class="text-brand-400">${userName}</span><br>
+                            I secure things for you.
+                        </h1>
+                        
+                        <p class="text-slate-400 text-sm md:text-base max-w-lg leading-relaxed mx-auto md:mx-0">
+                            I'm your private digital vault specializing in keeping your essential personal, financial, and professional documents highly secure and organized.
+                        </p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
+                            <button onclick="openUploadModal()" class="bg-brand-600 hover:bg-brand-500 text-white px-7 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-brand-500/30">
+                                Upload Dokumen <i class="fa-solid fa-arrow-up-right-from-square text-sm"></i>
+                            </button>
+                            <button onclick="navigate('all')" class="bg-slate-800/80 backdrop-blur-sm hover:bg-slate-700 text-white border border-slate-600 px-7 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                                Lihat Semua <i class="fa-solid fa-download text-sm"></i>
                             </button>
                         </div>
-                    `;
-                    folderDiv.onclick = () => { openFolder(docSnap.id, data.name); };
-                    folderGrid.appendChild(folderDiv);
-                });
-            } catch (error) {
-                folderGrid.innerHTML = `<div class="text-red-400">Gagal memuat: ${error.message}</div>`;
-            }
-        }
-
-        window.deleteFolder = async (folderId) => {
-            if(!confirm("Yakin ingin menghapus folder ini beserta semua isinya?")) return;
-            try {
-                await deleteDoc(doc(db, `users/${auth.currentUser.uid}/folders`, folderId));
-                activeFolderId = null;
-                document.getElementById('documentGrid').innerHTML = "";
-                document.getElementById('currentFolderName').innerHTML = `<i class="fa-solid fa-file-lines text-brand-400"></i> Pilih folder untuk melihat file`;
-                loadFolders();
-            } catch(e) {
-                alert("Gagal menghapus: " + e.message);
-            }
-        }
-
-        window.openFolder = (folderId, folderName) => {
-            activeFolderId = folderId;
-            document.getElementById('currentFolderName').innerHTML = `
-                <i class="fa-regular fa-folder-open text-brand-400"></i> Folder: ${folderName} 
-                <button onclick="uploadDocument()" class="ml-4 bg-dark-800 hover:bg-slate-700 border border-slate-600 text-xs px-3 py-1.5 rounded-lg text-white transition"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload File</button>
-            `;
-            loadDocuments();
-        };
-
-        // ================= DOCUMENT MANAGEMENT =================
-        window.uploadDocument = () => {
-            if (!activeFolderId) {
-                alert("Pilih folder terlebih dahulu!"); return;
-            }
-            
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*,application/pdf';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const docName = prompt("Beri nama untuk file ini:", file.name);
-                if (!docName) return;
-
-                const storageRef = ref(storage, `documents/${auth.currentUser.uid}/${activeFolderId}/${Date.now()}_${file.name}`);
-                const uploadTask = uploadBytesResumable(storageRef, file);
-
-                document.getElementById('currentFolderName').innerHTML += ` <span class="text-xs text-brand-400 ml-2 animate-pulse">Mengupload...</span>`;
-
-                uploadTask.on('state_changed', 
-                    (snapshot) => {}, 
-                    (error) => { alert("Upload Gagal: " + error.message); }, 
-                    async () => {
-                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                        await addDoc(collection(db, `users/${auth.currentUser.uid}/documents`), {
-                            folderId: activeFolderId,
-                            name: docName,
-                            fileName: file.name,
-                            url: downloadURL,
-                            type: file.type,
-                            path: uploadTask.snapshot.ref.fullPath,
-                            createdAt: serverTimestamp()
-                        });
-                        loadDocuments();
-                    }
-                );
-            };
-            input.click();
-        };
-
-        async function loadDocuments() {
-            if (!activeFolderId) return;
-            
-            const docGrid = document.getElementById('documentGrid');
-            docGrid.innerHTML = `<div class="text-slate-400 text-sm">Memuat file...</div>`;
-
-            try {
-                const q = query(collection(db, `users/${auth.currentUser.uid}/documents`), where("folderId", "==", activeFolderId));
-                const querySnapshot = await getDocs(q);
-                
-                docGrid.innerHTML = "";
-                
-                if(querySnapshot.empty) {
-                    docGrid.innerHTML = `<div class="col-span-full text-slate-500 p-8 border border-slate-700 border-dashed rounded-xl text-center bg-dark-800/30">Folder kosong. Klik tombol Upload File.</div>`;
-                    return;
-                }
-
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const isImg = data.type.startsWith('image/');
-                    const icon = isImg ? 'fa-image text-purple-400' : 'fa-file-pdf text-rose-400';
+                        
+                        <div class="pt-6">
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-3">TEKNOLOGI KEAMANAN</p>
+                            <div class="flex gap-4 justify-center md:justify-start">
+                                <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700 text-brand-400 text-xl shadow-sm"><i class="fa-brands fa-google"></i></div>
+                                <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700 text-yellow-500 text-xl shadow-sm"><i class="fa-solid fa-database"></i></div>
+                                <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700 text-blue-400 text-xl shadow-sm"><i class="fa-solid fa-cloud"></i></div>
+                                <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700 text-green-400 text-xl shadow-sm"><i class="fa-solid fa-lock"></i></div>
+                            </div>
+                        </div>
+                    </div>
                     
-                    const card = document.createElement('div');
-                    card.className = "glass-panel p-4 rounded-xl flex flex-col gap-3 group border-l-4 border-l-brand-500";
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-dark-800 flex items-center justify-center border border-slate-700">
-                                    <i class="fa-solid ${icon} text-lg"></i>
+                    <!-- Right Side: Big Profile Image with Glow & Code Box -->
+                    <div class="relative w-64 h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px] flex-shrink-0 group mx-auto md:mx-0">
+                        <!-- Glow Effect -->
+                        <div class="absolute inset-0 bg-brand-600 rounded-full opacity-30 blur-3xl group-hover:opacity-50 transition duration-700"></div>
+                        
+                        <!-- Main Profile Circle -->
+                        <div class="absolute inset-4 bg-slate-900 rounded-full overflow-hidden border-[6px] border-slate-800/80 shadow-2xl z-10 cursor-pointer" onclick="document.getElementById('profile-upload-input').click()" title="Ubah Foto Profil">
+                            <img id="hero-profile-img" src="${avatarUrl}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                            <!-- Overlay Upload Hover -->
+                            <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <i class="fa-solid fa-camera text-4xl text-white mb-2"></i>
+                                <span class="text-white text-xs font-bold tracking-widest uppercase">Ganti Foto</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating Code Snippet Card (Kanan Atas) -->
+                        <div class="absolute -right-2 top-8 md:-right-8 md:top-12 bg-slate-900/90 backdrop-blur-xl border border-slate-700/50 p-4 rounded-xl shadow-2xl z-20 hidden md:block transform hover:-translate-y-2 transition duration-300">
+                            <div class="flex items-center justify-between mb-3 border-b border-slate-700/50 pb-2">
+                                <span class="text-[10px] font-mono text-slate-400"><i class="fa-solid fa-code text-brand-400 mr-1"></i> Status</span>
+                                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            </div>
+                            <div class="text-[11px] font-mono leading-relaxed text-brand-300">
+                                <span class="text-purple-400">const</span> vault = {<br>
+                                &nbsp;&nbsp;owner: <span class="text-green-300">"${userName.split(' ')[0]}"</span>,<br>
+                                &nbsp;&nbsp;files: <span class="text-yellow-300">${allDocuments.length}</span>,<br>
+                                &nbsp;&nbsp;folders: <span class="text-yellow-300">${allFolders.length}</span>,<br>
+                                &nbsp;&nbsp;status: <span class="text-green-300">"Encrypted"</span><br>
+                                };
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATS SECTION (About Me style) -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 fade-in" style="animation-delay: 0.1s;">
+                    <div class="glass-card p-5 md:p-6 rounded-2xl flex flex-col justify-center items-center text-center gap-2">
+                        <div class="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center border border-slate-700 text-brand-400 text-2xl mb-1 shadow-inner"><i class="fa-solid fa-folder-closed"></i></div>
+                        <h3 class="text-3xl font-display font-bold text-white">${allFolders.length}</h3>
+                        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Total Folders</p>
+                    </div>
+                    <div class="glass-card p-5 md:p-6 rounded-2xl flex flex-col justify-center items-center text-center gap-2">
+                        <div class="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center border border-slate-700 text-brand-400 text-2xl mb-1 shadow-inner"><i class="fa-solid fa-file-shield"></i></div>
+                        <h3 class="text-3xl font-display font-bold text-white">${allDocuments.length}</h3>
+                        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Secure Files</p>
+                    </div>
+                    <div class="glass-card p-5 md:p-6 rounded-2xl flex flex-col justify-center items-center text-center gap-2">
+                        <div class="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center border border-slate-700 text-yellow-500 text-2xl mb-1 shadow-inner"><i class="fa-solid fa-star"></i></div>
+                        <h3 class="text-3xl font-display font-bold text-white">${allDocuments.filter(d => d.isFavorite).length}</h3>
+                        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Favorites</p>
+                    </div>
+                    <div class="glass-card p-5 md:p-6 rounded-2xl flex flex-col justify-center items-center text-center gap-2">
+                        <div class="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center border border-slate-700 text-green-400 text-2xl mb-1 shadow-inner"><i class="fa-solid fa-server"></i></div>
+                        <h3 class="text-3xl font-display font-bold text-white">100%</h3>
+                        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Uptime</p>
+                    </div>
+                </div>
+            `;
+
+            // FOLDER GRID (My Skills style)
+            if(allFolders.length > 0) {
+                html += `
+                    <div class="mb-16 fade-in" style="animation-delay: 0.2s;">
+                        <div class="text-center mb-8">
+                            <p class="text-brand-400 text-xs font-bold tracking-widest uppercase mb-2">MY VAULT</p>
+                            <h2 class="text-3xl font-display font-bold text-white">Folders I Manage</h2>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                            ${allFolders.map(f => {
+                                const count = allDocuments.filter(d => d.folderId === f.id).length;
+                                return `
+                                <div onclick="navigate('folder', '${f.id}')" class="glass-card rounded-2xl p-5 cursor-pointer hover:border-brand-500/50 hover:bg-slate-800/90 transition transform hover:-translate-y-1 group border-t-4 border-t-brand-500/80">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <i class="fa-solid fa-folder-open text-3xl text-brand-400 group-hover:scale-110 transition"></i>
+                                        <span class="text-lg font-bold text-slate-300">${count}</span>
+                                    </div>
+                                    <h4 class="font-bold text-white truncate text-base mb-1">${f.name}</h4>
+                                    <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-brand-500 h-full w-[85%] rounded-full opacity-80"></div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="font-medium text-sm text-white truncate w-32 md:w-40" title="${data.name}">${data.name}</h4>
-                                    <span class="text-[10px] text-slate-400 uppercase tracking-wider">${isImg ? 'GAMBAR' : 'PDF'}</span>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // RECENT DOCS GRID (Featured Projects style)
+            html += `
+                <div class="fade-in" style="animation-delay: 0.3s;">
+                    <div class="text-center mb-8">
+                        <p class="text-brand-400 text-xs font-bold tracking-widest uppercase mb-2">RECENT DOCUMENTS</p>
+                        <h2 class="text-3xl font-display font-bold text-white">Some of My Recent Files</h2>
+                    </div>
+                    ${allDocuments.length === 0 ? `
+                        <div class="glass-card rounded-3xl p-10 text-center border-dashed border-2 border-slate-700 max-w-2xl mx-auto">
+                            <div class="w-20 h-20 bg-slate-800/80 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-500 shadow-inner">
+                                <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                            </div>
+                            <h4 class="text-white font-bold text-xl mb-2">Belum Ada Dokumen</h4>
+                            <p class="text-sm text-slate-400 font-medium mb-6">Mulai simpan dan amankan file penting Anda di sini.</p>
+                            <button onclick="openUploadModal()" class="px-8 py-3.5 bg-brand-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-brand-500/20 hover:bg-brand-500 transition">Upload File Pertama</button>
+                        </div>
+                    ` : `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            ${allDocuments.slice(0, 8).map(doc => createDocumentCard(doc)).join('')}
+                        </div>
+                        <div class="mt-8 text-center">
+                            <button onclick="navigate('all')" class="inline-flex items-center gap-2 text-sm font-bold text-white bg-slate-800 hover:bg-slate-700 px-6 py-3 rounded-full border border-slate-600 transition">
+                                Lihat Semua File <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    `}
+                </div>
+                
+                <!-- Footer -->
+                <div class="mt-20 pt-8 border-t border-slate-700/50 flex flex-col md:flex-row justify-between items-center text-slate-500 text-xs font-medium pb-4">
+                    <p>&copy; ${new Date().getFullYear()} ${userName}. All rights reserved.</p>
+                    <p class="mt-2 md:mt-0">Made with <i class="fa-solid fa-heart text-red-500 mx-1"></i> for Security</p>
+                </div>
+            `;
+            content.innerHTML = html;
+        }
+
+        function renderDocumentList(docs, folderInfo = null) {
+            const content = document.getElementById('main-content');
+            let html = '';
+            
+            if (folderInfo) {
+                html += `
+                    <div class="mb-6 flex items-center gap-4 glass-card p-5 rounded-2xl shadow-md fade-in border border-brand-500/20">
+                        <div class="w-14 h-14 rounded-xl bg-brand-500/20 flex items-center justify-center border border-brand-500/30">
+                            <i class="fa-solid fa-folder-open text-2xl text-brand-400"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-display font-bold text-xl text-white">${folderInfo.name}</h2>
+                            <p class="text-sm text-slate-400 font-medium">${docs.length} file tersimpan di folder ini</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if(docs.length === 0) {
+                html += `
+                    <div class="flex flex-col items-center justify-center h-[50vh] text-center fade-in">
+                        <i class="fa-solid fa-folder-open text-6xl text-slate-700 drop-shadow-md mb-4"></i>
+                        <p class="text-slate-300 font-bold text-lg bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 shadow-sm">Belum ada data di sini.</p>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 fade-in">
+                        ${docs.map(doc => createDocumentCard(doc)).join('')}
+                    </div>
+                `;
+            }
+            content.innerHTML = html;
+        }
+
+        function createDocumentCard(doc) {
+            const date = new Date(doc.createdAt?.toDate() || Date.now()).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+            const isPdf = doc.fileType === 'application/pdf';
+            const folder = allFolders.find(f => f.id === doc.folderId);
+            const folderName = folder ? folder.name : 'Umum';
+
+            return `
+                <div class="glass-card rounded-2xl overflow-hidden shadow-md hover:border-brand-500/50 transition-all duration-300 group flex flex-col h-full relative">
+                    <button onclick="toggleFavorite('${doc.id}', ${!doc.isFavorite})" class="absolute top-2 right-2 z-10 w-8 h-8 bg-slate-900/60 backdrop-blur-md rounded-full flex items-center justify-center text-slate-300 hover:text-yellow-400 hover:bg-slate-900 shadow-sm border border-white/5 transition ${doc.isFavorite ? 'text-yellow-400 bg-slate-900' : ''}">
+                        <i class="fa-solid fa-star ${doc.isFavorite ? '' : 'fa-regular'} text-xs"></i>
+                    </button>
+
+                    <div class="h-36 bg-slate-900/50 flex items-center justify-center relative overflow-hidden group-hover:bg-slate-900/80 transition cursor-pointer" onclick="openPreview('${doc.id}')">
+                        ${isPdf ? `
+                            <div class="w-full h-full bg-slate-800 flex items-center justify-center">
+                                <i class="fa-solid fa-file-pdf text-5xl text-red-400 drop-shadow-md"></i>
+                            </div>
+                            <div class="absolute bottom-2 right-2 bg-red-500/90 text-white text-[9px] px-2 py-0.5 rounded uppercase font-bold tracking-wider">PDF</div>
+                        ` : `
+                            <img src="${doc.fileUrl}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500 opacity-90 group-hover:opacity-100" loading="lazy">
+                        `}
+                        
+                        <div class="absolute inset-0 bg-brand-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[1px]">
+                            <div class="w-10 h-10 bg-slate-900/80 rounded-full flex items-center justify-center text-white shadow-xl transform scale-50 group-hover:scale-100 transition-transform duration-300 border border-brand-500/50">
+                                <i class="fa-solid fa-expand text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 flex-1 flex flex-col">
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <i class="fa-solid fa-folder text-[10px] text-brand-400"></i>
+                            <span class="text-[10px] font-bold text-brand-400 uppercase tracking-wider truncate">${folderName}</span>
+                        </div>
+                        <h4 class="font-display font-bold text-white text-sm leading-tight line-clamp-2 flex-1 cursor-pointer group-hover:text-brand-300 transition" onclick="openPreview('${doc.id}')">${doc.name}</h4>
+                        
+                        <div class="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-700 pt-3">
+                            <span class="font-medium"><i class="fa-regular fa-calendar mr-1"></i> ${date}</span>
+                            <div class="flex gap-2">
+                                <a href="${doc.fileUrl}" target="_blank" class="w-7 h-7 bg-slate-800 rounded border border-slate-600 flex items-center justify-center text-slate-300 hover:text-brand-400 hover:border-brand-500/50 transition" title="Download"><i class="fa-solid fa-download text-[11px]"></i></a>
+                                <button onclick="confirmDelete('${doc.id}', '${doc.storagePath}')" class="w-7 h-7 bg-slate-800 rounded border border-slate-600 flex items-center justify-center text-slate-300 hover:text-red-400 hover:border-red-500/50 transition" title="Hapus"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Tampilan Profil (Sudah ditambahkan fitur ganti foto)
+        function renderProfile() {
+            const avatarUrl = currentUser.photoURL || `https://placehold.co/150x150/4f46e5/ffffff?text=${(currentUser.displayName || 'U').charAt(0).toUpperCase()}`;
+            
+            document.getElementById('main-content').innerHTML = `
+                <div class="max-w-2xl mx-auto fade-in mt-4">
+                    <div class="glass-panel rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative">
+                        <div class="h-32 bg-gradient-to-r from-brand-600 to-slate-900 relative border-b border-brand-500/30">
+                            <div class="absolute inset-0 bg-black/20 opacity-50" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+                        </div>
+                        <div class="px-6 md:px-8 pb-8 relative">
+                            <div class="flex justify-between items-end -mt-14 mb-4">
+                                <!-- FITUR GANTI FOTO PROFIL -->
+                                <div class="relative inline-block group">
+                                    <img id="profile-img-preview" src="${avatarUrl}" class="w-28 h-28 rounded-full border-4 border-slate-900 shadow-xl object-cover bg-slate-800 relative z-10 cursor-pointer hover:border-brand-500 transition" onclick="document.getElementById('profile-upload-input').click()">
+                                    <button id="profile-upload-btn" onclick="document.getElementById('profile-upload-input').click()" class="absolute bottom-1 right-1 z-20 w-8 h-8 bg-brand-500 rounded-full border-2 border-slate-900 flex items-center justify-center text-white hover:bg-brand-400 transition cursor-pointer shadow-lg transform group-hover:scale-110">
+                                        <i class="fa-solid fa-camera text-xs"></i>
+                                    </button>
+                                </div>
+                                
+                                <span class="bg-brand-500/20 text-brand-300 border border-brand-500/50 px-4 py-1.5 rounded-full text-[11px] font-bold shadow-md flex items-center gap-1.5 tracking-wide"><i class="fa-solid fa-shield-check"></i> PRO VERIFIED</span>
+                            </div>
+                            <h2 class="text-2xl font-display font-bold text-white tracking-wide">${currentUser.displayName || 'Pengguna'}</h2>
+                            <p class="text-slate-400 font-medium text-sm mt-1 font-mono">${currentUser.email}</p>
+                            
+                            <div class="mt-8 bg-slate-900/60 rounded-2xl p-5 border border-white/5 shadow-inner space-y-4">
+                                <div class="flex justify-between items-center pb-4 border-b border-slate-700/50">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-slate-800 rounded flex items-center justify-center text-slate-400 border border-slate-700"><i class="fa-solid fa-folder"></i></div>
+                                        <span class="text-sm font-bold text-slate-300">Total Folder</span>
+                                    </div>
+                                    <span class="text-sm font-bold text-brand-400 bg-brand-500/10 px-3 py-1 rounded border border-brand-500/20">${allFolders.length} Folder</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-slate-800 rounded flex items-center justify-center text-slate-400 border border-slate-700"><i class="fa-solid fa-file-shield"></i></div>
+                                        <span class="text-sm font-bold text-slate-300">Total File Data</span>
+                                    </div>
+                                    <span class="text-sm font-bold text-brand-400 bg-brand-500/10 px-3 py-1 rounded border border-brand-500/20">${allDocuments.length} File</span>
                                 </div>
                             </div>
-                            <button onclick="deleteDocument('${docSnap.id}', '${data.path}')" class="text-slate-500 hover:text-red-400 transition"><i class="fa-solid fa-trash text-sm"></i></button>
                         </div>
-                        <div class="mt-2 grid grid-cols-2 gap-2">
-                            <a href="${data.url}" target="_blank" class="text-center py-2 bg-dark-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-xs font-medium text-white transition"><i class="fa-solid fa-eye mr-1"></i> Lihat</a>
-                            <a href="${data.url}" download class="text-center py-2 bg-brand-600/20 hover:bg-brand-600/40 border border-brand-500/30 text-brand-400 rounded-lg text-xs font-medium transition"><i class="fa-solid fa-download mr-1"></i> Unduh</a>
-                        </div>
-                    `;
-                    docGrid.appendChild(card);
-                });
-            } catch(e) {
-                docGrid.innerHTML = `<div class="text-red-400">Error: ${e.message}</div>`;
-            }
+                    </div>
+                </div>
+            `;
         }
 
-        window.deleteDocument = async (docId, filePath) => {
-            if(!confirm("Hapus dokumen ini permanen?")) return;
-            try {
-                await deleteObject(ref(storage, filePath));
-                await deleteDoc(doc(db, `users/${auth.currentUser.uid}/documents`, docId));
-                loadDocuments();
-            } catch(e) {
-                alert("Gagal menghapus: " + e.message);
+        // --- UPLOAD LOGIC ---
+        let selectedFile = null;
+        document.getElementById('file-input')?.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                const preview = document.getElementById('file-preview-name');
+                preview.innerHTML = `<i class="fa-solid fa-file-check mr-2 text-brand-400"></i> ${selectedFile.name} <span class="text-slate-500 font-normal ml-1">(${(selectedFile.size/1024/1024).toFixed(2)} MB)</span>`;
+                preview.classList.remove('hidden');
+                document.getElementById('dropzone').classList.add('border-brand-500', 'bg-slate-800/80');
             }
-        }
+        });
+
+        window.openUploadModal = () => {
+            document.getElementById('upload-modal').classList.remove('hidden');
+            document.getElementById('upload-form').reset();
+            selectedFile = null;
+            document.getElementById('file-preview-name').classList.add('hidden');
+            document.getElementById('dropzone').classList.remove('border-brand-500', 'bg-slate-800/80');
+        };
+        window.closeUploadModal = () => document.getElementById('upload-modal').classList.add('hidden');
+
+        window.submitUpload = async () => {
+            if(!currentUser) return;
+            const name = document.getElementById('doc-name').value;
+            const folderId = document.getElementById('doc-folder').value;
+            
+            if(!selectedFile) return showToast("Pilih file data terlebih dahulu", "error");
+            if(!name || !folderId) return showToast("Nama dan Folder wajib diisi", "error");
+
+            const btn = document.getElementById('btn-submit-upload');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Proses...';
+            btn.disabled = true;
+
+            try {
+                const fileName = `doc_${Date.now()}.${selectedFile.name.split('.').pop()}`;
+                const storagePath = `documents/${currentUser.uid}/${fileName}`;
+                const storageRef = ref(storage, storagePath);
+                
+                await uploadBytesResumable(storageRef, selectedFile);
+                const downloadURL = await getDownloadURL(storageRef);
+
+                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'documents'), {
+                    name, folderId, notes: document.getElementById('doc-notes').value || '',
+                    fileUrl: downloadURL, storagePath, fileType: selectedFile.type,
+                    createdAt: serverTimestamp(), isFavorite: false
+                });
+
+                showToast("Data berhasil diamankan!");
+                closeUploadModal();
+            } catch (e) { showToast("Gagal upload", "error"); } 
+            finally { btn.innerHTML = '<i class="fa-solid fa-upload"></i> Simpan Data'; btn.disabled = false; }
+        };
+
+        // --- PREVIEW & ACTION LOGIC ---
+        window.openPreview = (docId) => {
+            const doc = allDocuments.find(d => d.id === docId);
+            if(!doc) return;
+            const container = document.getElementById('preview-container');
+            document.getElementById('preview-download-btn').href = doc.fileUrl;
+            
+            if (doc.fileType === 'application/pdf') {
+                container.innerHTML = `<iframe src="${doc.fileUrl}" class="w-full h-full rounded-xl bg-slate-900" title="PDF"></iframe>`;
+            } else {
+                container.innerHTML = `<img src="${doc.fileUrl}" class="max-w-full max-h-full object-contain drop-shadow-2xl rounded-xl">`;
+            }
+            document.getElementById('preview-modal').classList.remove('hidden');
+        };
+
+        window.closePreviewModal = () => {
+            document.getElementById('preview-modal').classList.add('hidden');
+            document.getElementById('preview-container').innerHTML = ''; 
+        };
+
+        window.toggleFavorite = async (docId, status) => {
+            try { await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'documents', docId), { isFavorite: status }); } catch (e) {}
+        };
+
+        let docToDelete = null;
+        window.confirmDelete = (docId, path) => { docToDelete = { id: docId, path }; document.getElementById('delete-modal').classList.remove('hidden'); };
+        window.closeDeleteModal = () => { docToDelete = null; document.getElementById('delete-modal').classList.add('hidden'); };
+
+        document.getElementById('confirm-delete-btn')?.addEventListener('click', async () => {
+            if(!docToDelete || !currentUser) return;
+            const btn = document.getElementById('confirm-delete-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+
+            try {
+                try { await deleteObject(ref(storage, docToDelete.path)); } catch(e) {}
+                await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'documents', docToDelete.id));
+                showToast("Data dihapus permanen");
+            } catch (e) {} finally {
+                btn.innerHTML = 'Ya, Hapus'; btn.disabled = false; closeDeleteModal();
+            }
+        });
+
+        // Search
+        document.getElementById('global-search')?.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            if(query.length > 1) {
+                renderDocumentList(allDocuments.filter(d => d.name.toLowerCase().includes(query)));
+                document.getElementById('header-title').textContent = `Cari: "${query}"`;
+            } else if(query.length === 0) navigate(currentView, currentView === 'folder' ? document.querySelector('.nav-item.bg-slate-800\\/80')?.dataset.view.replace('folder-','') : null);
+        });
     </script>
 </body>
 </html>
+```
