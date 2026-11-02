@@ -316,7 +316,7 @@
         // Tambahan fitur updateProfile untuk mengganti foto profil
         import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // Konfigurasi Firebase Milik Anda
         const firebaseConfig = {
@@ -432,7 +432,7 @@
                 // Upload foto ke Storage
                 const storagePath = `profiles/${currentUser.uid}_${Date.now()}`;
                 const storageRef = ref(storage, storagePath);
-                await uploadBytesResumable(storageRef, file);
+                await uploadBytes(storageRef, file);
                 const downloadURL = await getDownloadURL(storageRef);
                 
                 // Update profil pengguna di Authentication
@@ -922,11 +922,11 @@
             btn.disabled = true;
 
             try {
-                const fileName = `doc_${Date.now()}.${selectedFile.name.split('.').pop()}`;
+                const fileName = `doc_${Date.now()}_${selectedFile.name}`;
                 const storagePath = `documents/${currentUser.uid}/${fileName}`;
                 const storageRef = ref(storage, storagePath);
                 
-                await uploadBytesResumable(storageRef, selectedFile);
+                await uploadBytes(storageRef, selectedFile);
                 const downloadURL = await getDownloadURL(storageRef);
 
                 await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'documents'), {
@@ -937,7 +937,10 @@
 
                 showToast("Data berhasil diamankan!");
                 closeUploadModal();
-            } catch (e) { showToast("Gagal upload", "error"); } 
+            } catch (e) { 
+                console.error(e);
+                showToast("Gagal: " + e.message, "error"); 
+            } 
             finally { btn.innerHTML = '<i class="fa-solid fa-upload"></i> Simpan Data'; btn.disabled = false; }
         };
 
