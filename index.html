@@ -288,17 +288,18 @@
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // IMPORTANT: USER MUST FILL THIS CONFIGURATION BEFORE DEPLOYMENT
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // apiKey: "YOUR_API_KEY",
-            // authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            // projectId: "YOUR_PROJECT_ID",
-            // storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            // messagingSenderId: "YOUR_SENDER_ID",
-            // appId: "YOUR_APP_ID"
+        // Konfigurasi Firebase dari akun Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBPtcWIM1s_Vf-4OGCt-LTYeSiosNVRhs",
+            authDomain: "data-pribadi-1b175.firebaseapp.com",
+            projectId: "data-pribadi-1b175",
+            storageBucket: "data-pribadi-1b175.firebasestorage.app",
+            messagingSenderId: "236777372220",
+            appId: "1:236777372220:web:da9cbc51e966d63147e139",
+            measurementId: "G-NC79XS3YDH"
         };
         
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'my-documents-vault';
+        const appId = 'my-documents-vault';
 
         let app, auth, db, storage;
         try {
