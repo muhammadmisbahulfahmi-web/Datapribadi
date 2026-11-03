@@ -72,7 +72,6 @@
         });
     </script>
 
-    <!-- KODE UTAMA REACT (Tidak memakai import modul, pakai variabel global) -->
     <script type="text/babel">
         const { useState, useEffect, createContext, useContext } = React;
 
@@ -106,6 +105,7 @@
             const [user, setUser] = useState(null);
             const [role, setRole] = useState('user');
             const [loading, setLoading] = useState(true);
+            const [authError, setAuthError] = useState('');
 
             useEffect(() => {
                 const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -132,8 +132,9 @@
                             }
                             setUser(currentUser);
                         } catch (error) {
-                            console.error("Error fetching user data:", error);
-                            alert("Terjadi kesalahan sistem. Pastikan Firestore Rules sudah diizinkan (allow read/write).");
+                            console.error("Error database:", error);
+                            setAuthError("Gagal mengakses database. Pastikan Firestore sudah diaktifkan di Firebase Console.");
+                            auth.signOut();
                         }
                     } else {
                         setUser(null);
@@ -145,7 +146,7 @@
             }, []);
 
             return (
-                <AuthContext.Provider value={{ user, role, loading }}>
+                <AuthContext.Provider value={{ user, role, loading, authError, setAuthError }}>
                     {children}
                 </AuthContext.Provider>
             );
@@ -166,14 +167,23 @@
 
         const Login = () => {
             const [isLoggingIn, setIsLoggingIn] = useState(false);
+            const { authError, setAuthError } = useContext(AuthContext);
 
             const handleLogin = async () => {
                 setIsLoggingIn(true);
+                setAuthError(''); // Reset error
                 try {
+                    // Set persistence agar sesi tidak hilang
+                    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    // Panggil popup langsung tanpa delay
                     await auth.signInWithPopup(provider);
                 } catch (error) {
-                    alert("Gagal login: " + error.message);
+                    console.error("Login Error:", error);
                     setIsLoggingIn(false);
+                    // Abaikan error jika user menutup popup sendiri
+                    if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+                        setAuthError("Gagal login: " + error.message);
+                    }
                 }
             };
 
@@ -186,17 +196,24 @@
                         <h1 className="text-3xl font-bold text-gray-800 mb-2">MY DOCUMENTS</h1>
                         <p className="text-gray-500 mb-8">Personal Document Management System</p>
                         
+                        {authError && (
+                            <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm text-left border border-red-200">
+                                <i className="fas fa-exclamation-triangle mr-2"></i> {authError}
+                            </div>
+                        )}
+
                         <button 
                             onClick={handleLogin}
                             disabled={isLoggingIn}
                             className="w-full bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition-all shadow-sm disabled:opacity-50"
                         >
                             {isLoggingIn ? (
-                                <span className="flex items-center gap-2"><i className="fas fa-spinner fa-spin"></i> Memproses...</span>
+                                <span className="flex items-center gap-2"><i className="fas fa-spinner fa-spin"></i> Sedang Membuka...</span>
                             ) : (
                                 <><img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" /> Lanjutkan dengan Google</>
                             )}
                         </button>
+                        <p className="text-xs text-gray-400 mt-6">Login yang aman menggunakan Akun Google Anda</p>
                     </div>
                 </div>
             );
@@ -289,7 +306,7 @@
                             <h2 className="text-2xl md:text-3xl font-bold mb-2">Halo, {user.displayName ? user.displayName.split(' ')[0] : 'User'}! 👋</h2>
                             <p className="text-blue-100 text-sm md:text-base">Selamat datang di arsip dokumen digital pribadi Anda.</p>
                         </div>
-                        <button onClick={() => alert('Tahap Upload Backend Cloudinary')} className="w-full md:w-auto bg-white text-primary px-6 py-3 rounded-xl font-bold shadow-md hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                        <button onClick={() => alert('Fitur Upload akan aktif di tahap selanjutnya (Cloudinary Integration)')} className="w-full md:w-auto bg-white text-primary px-6 py-3 rounded-xl font-bold shadow-md hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
                             <i className="fas fa-cloud-upload-alt"></i> Upload Dokumen
                         </button>
                     </div>
