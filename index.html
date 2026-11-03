@@ -15,6 +15,11 @@
     
     <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Firebase Compat SDKs (Stabil untuk semua browser) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
         tailwind.config = {
@@ -40,7 +45,6 @@
     </style>
 </head>
 <body>
-    <!-- Fallback & Error Handling -->
     <div id="error-log"></div>
     <div id="root">
         <div style="display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; gap:1rem;">
@@ -50,32 +54,30 @@
         </div>
     </div>
 
-    <!-- Script Penangkap Error -->
+    <!-- Script Penangkap Error Global -->
     <script>
         window.addEventListener('error', function(event) {
-            document.getElementById('error-log').style.display = 'block';
-            document.getElementById('error-log').innerText += 'Error: ' + event.message + '\nFile: ' + event.filename + ':' + event.lineno + '\n\n';
-            document.getElementById('root').style.display = 'none';
+            const errLog = document.getElementById('error-log');
+            if(errLog) {
+                errLog.style.display = 'block';
+                errLog.innerText += 'Error: ' + event.message + '\n\n';
+            }
         });
         window.addEventListener('unhandledrejection', function(event) {
-            document.getElementById('error-log').style.display = 'block';
-            document.getElementById('error-log').innerText += 'Promise Error: ' + event.reason + '\n\n';
-            document.getElementById('root').style.display = 'none';
+            const errLog = document.getElementById('error-log');
+            if(errLog) {
+                errLog.style.display = 'block';
+                errLog.innerText += 'Promise Error: ' + event.reason + '\n\n';
+            }
         });
     </script>
 
-    <script type="text/babel" data-type="module">
-        // ==========================================
-        // 1. IMPORT FIREBASE (DIRECT URL UNTUK MENGHINDARI IMPORTMAP ERROR)
-        // ==========================================
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
+    <!-- KODE UTAMA REACT (Tidak memakai import modul, pakai variabel global) -->
+    <script type="text/babel">
         const { useState, useEffect, createContext, useContext } = React;
 
         // ==========================================
-        // 2. KONFIGURASI FIREBASE ANDA
+        // 1. INISIALISASI FIREBASE
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyDC2RFaoVnOFVVYRRhbFcbvO0ZdbT1Bfug",
@@ -88,13 +90,15 @@
             measurementId: "G-6TVS5Y1VQ2"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const provider = new firebase.auth.GoogleAuthProvider();
 
         // ==========================================
-        // 3. STATE MANAGEMENT (CONTEXT)
+        // 2. STATE MANAGEMENT (CONTEXT)
         // ==========================================
         const AuthContext = createContext();
         
@@ -104,32 +108,32 @@
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
-                const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+                const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
                     if (currentUser) {
                         try {
-                            const userRef = doc(db, 'users', currentUser.uid);
-                            const userSnap = await getDoc(userRef);
+                            const userRef = db.collection('users').doc(currentUser.uid);
+                            const userSnap = await userRef.get();
                             
-                            if (!userSnap.exists()) {
-                                await setDoc(userRef, {
+                            if (!userSnap.exists) {
+                                await userRef.set({
                                     uid: currentUser.uid,
                                     displayName: currentUser.displayName,
                                     email: currentUser.email,
                                     photoURL: currentUser.photoURL,
                                     role: 'user', 
-                                    createdAt: serverTimestamp(),
-                                    lastLogin: serverTimestamp()
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 setRole('user');
                             } else {
                                 const userData = userSnap.data();
-                                setRole(userData.role);
-                                await setDoc(userRef, { lastLogin: serverTimestamp() }, { merge: true });
+                                setRole(userData.role || 'user');
+                                await userRef.update({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() });
                             }
                             setUser(currentUser);
                         } catch (error) {
                             console.error("Error fetching user data:", error);
-                            alert("Terjadi kesalahan saat memuat data profil. Pastikan Firestore aktif.");
+                            alert("Terjadi kesalahan sistem. Pastikan Firestore Rules sudah diizinkan (allow read/write).");
                         }
                     } else {
                         setUser(null);
@@ -148,7 +152,7 @@
         };
 
         // ==========================================
-        // 4. KOMPONEN UI & PAGES
+        // 3. KOMPONEN UI & PAGES
         // ==========================================
         const categories = [
             { id: 'kk', name: 'Kartu Keluarga', icon: 'fa-users' },
@@ -160,13 +164,16 @@
             { id: 'lainnya', name: 'Lainnya', icon: 'fa-file-alt' }
         ];
 
-        // --- HALAMAN LOGIN ---
         const Login = () => {
+            const [isLoggingIn, setIsLoggingIn] = useState(false);
+
             const handleLogin = async () => {
+                setIsLoggingIn(true);
                 try {
-                    await signInWithPopup(auth, provider);
+                    await auth.signInWithPopup(provider);
                 } catch (error) {
                     alert("Gagal login: " + error.message);
+                    setIsLoggingIn(false);
                 }
             };
 
@@ -181,21 +188,20 @@
                         
                         <button 
                             onClick={handleLogin}
-                            className="w-full bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition-all shadow-sm"
+                            disabled={isLoggingIn}
+                            className="w-full bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition-all shadow-sm disabled:opacity-50"
                         >
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" />
-                            Lanjutkan dengan Google
+                            {isLoggingIn ? (
+                                <span className="flex items-center gap-2"><i className="fas fa-spinner fa-spin"></i> Memproses...</span>
+                            ) : (
+                                <><img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" /> Lanjutkan dengan Google</>
+                            )}
                         </button>
-                        
-                        <div className="mt-8 text-xs text-gray-400">
-                            <p><i className="fas fa-lock mr-1"></i> Terenkripsi & Akses Privat</p>
-                        </div>
                     </div>
                 </div>
             );
         };
 
-        // --- LAYOUT DASHBOARD ---
         const DashboardLayout = ({ children, title }) => {
             const { user, role } = useContext(AuthContext);
             const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -210,9 +216,6 @@
                         <div className="p-6 flex items-center gap-3 border-b border-blue-800">
                             <i className="fas fa-folder-open text-2xl"></i>
                             <span className="text-xl font-bold tracking-wider">MY DOCS</span>
-                            <button onClick={() => setSidebarOpen(false)} className="ml-auto md:hidden text-gray-300 hover:text-white">
-                                <i className="fas fa-times text-xl"></i>
-                            </button>
                         </div>
                         
                         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -237,7 +240,7 @@
                                     <p className="text-xs text-blue-300 capitalize">{role}</p>
                                 </div>
                             </div>
-                            <button onClick={() => signOut(auth)} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-sm font-medium transition-colors shadow">
+                            <button onClick={() => auth.signOut()} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-sm font-medium transition-colors shadow">
                                 <i className="fas fa-sign-out-alt"></i> Logout
                             </button>
                         </div>
@@ -252,7 +255,6 @@
                                 <h2 className="text-lg md:text-xl font-semibold text-gray-800">{title}</h2>
                             </div>
                         </header>
-                        
                         <div className="flex-1 overflow-auto p-4 md:p-6">
                             {children}
                         </div>
@@ -261,7 +263,6 @@
             );
         };
 
-        // --- DASHBOARD USER ---
         const UserDashboard = () => {
             const { user } = useContext(AuthContext);
             const [documents, setDocuments] = useState([]);
@@ -270,10 +271,9 @@
                 const fetchDocs = async () => {
                     if(!user) return;
                     try {
-                        const q = query(collection(db, "documents"), where("ownerUid", "==", user.uid));
-                        const querySnapshot = await getDocs(q);
+                        const snap = await db.collection("documents").where("ownerUid", "==", user.uid).get();
                         const docs = [];
-                        querySnapshot.forEach((doc) => { docs.push({ id: doc.id, ...doc.data() }); });
+                        snap.forEach((doc) => { docs.push({ id: doc.id, ...doc.data() }); });
                         setDocuments(docs);
                     } catch (err) {
                         console.error("Belum ada dokumen / error:", err);
@@ -282,10 +282,6 @@
                 fetchDocs();
             }, [user]);
 
-            const triggerUpload = () => {
-                alert("Tombol Upload berfungsi! Integrasi Cloudinary akan dilakukan di tahap selanjutnya (Backend API).");
-            };
-
             return (
                 <div className="fade-in space-y-6 max-w-6xl mx-auto">
                     <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 md:p-8 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -293,7 +289,7 @@
                             <h2 className="text-2xl md:text-3xl font-bold mb-2">Halo, {user.displayName ? user.displayName.split(' ')[0] : 'User'}! 👋</h2>
                             <p className="text-blue-100 text-sm md:text-base">Selamat datang di arsip dokumen digital pribadi Anda.</p>
                         </div>
-                        <button onClick={triggerUpload} className="w-full md:w-auto bg-white text-primary px-6 py-3 rounded-xl font-bold shadow-md hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                        <button onClick={() => alert('Tahap Upload Backend Cloudinary')} className="w-full md:w-auto bg-white text-primary px-6 py-3 rounded-xl font-bold shadow-md hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
                             <i className="fas fa-cloud-upload-alt"></i> Upload Dokumen
                         </button>
                     </div>
@@ -323,7 +319,6 @@
             );
         };
 
-        // --- DASHBOARD ADMIN ---
         const AdminDashboard = () => {
             const [users, setUsers] = useState([]);
             const [loadingData, setLoadingData] = useState(true);
@@ -331,13 +326,12 @@
             useEffect(() => {
                 const fetchUsers = async () => {
                     try {
-                        const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
-                        const snap = await getDocs(q);
+                        const snap = await db.collection("users").orderBy("createdAt", "desc").get();
                         const usersList = [];
                         snap.forEach((doc) => usersList.push(doc.data()));
                         setUsers(usersList);
                     } catch(err) {
-                        console.log("Error mengambil user (Biasanya butuh Index Firestore):", err);
+                        console.log("Error mengambil user:", err);
                     } finally {
                         setLoadingData(false);
                     }
@@ -349,7 +343,6 @@
                 <div className="fade-in space-y-6 max-w-6xl mx-auto">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800">Admin Panel</h2>
-                        <p className="text-gray-500">Kelola pengguna dan pantau sistem secara keseluruhan.</p>
                     </div>
 
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -361,4 +354,67 @@
                                 <thead>
                                     <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                                         <th className="p-4 font-semibold border-b">Profil Pengguna</th>
-     
+                                        <th className="p-4 font-semibold border-b">Email</th>
+                                        <th className="p-4 font-semibold border-b text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loadingData ? (
+                                        <tr><td colSpan="3" className="p-8 text-center text-gray-500">Memuat data...</td></tr>
+                                    ) : users.length === 0 ? (
+                                        <tr><td colSpan="3" className="p-8 text-center text-gray-500">Belum ada pengguna.</td></tr>
+                                    ) : (
+                                        users.map(u => (
+                                            <tr key={u.uid} className="hover:bg-gray-50 border-b border-gray-100">
+                                                <td className="p-4 flex items-center gap-3">
+                                                    <img src={u.photoURL || 'https://via.placeholder.com/150'} alt="Foto" className="w-10 h-10 rounded-full" referrerPolicy="no-referrer" />
+                                                    <span className="font-semibold text-gray-800">{u.displayName}</span>
+                                                </td>
+                                                <td className="p-4 text-gray-600 text-sm">{u.email}</td>
+                                                <td className="p-4 text-center">
+                                                    <button className="bg-blue-50 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold">
+                                                        Lihat
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const { user, role, loading } = useContext(AuthContext);
+
+            if (loading) {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 gap-4">
+                        <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin" style={{ animation: 'spin 1s linear infinite' }}></div>
+                        <p className="text-gray-500 font-medium">Memuat sistem...</p>
+                    </div>
+                );
+            }
+
+            if (!user) return <Login />;
+            if (role === 'admin' || role === 'superadmin') {
+                return <DashboardLayout title="Admin Dashboard"><AdminDashboard /></DashboardLayout>;
+            }
+            return <DashboardLayout title="Dashboard Saya"><UserDashboard /></DashboardLayout>;
+        };
+
+        try {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(<AuthProvider><App /></AuthProvider>);
+        } catch(e) {
+            console.error(e);
+            document.getElementById('error-log').style.display = 'block';
+            document.getElementById('error-log').innerText = "React Error: " + e.message;
+        }
+    </script>
+</body>
+</html>
+```
